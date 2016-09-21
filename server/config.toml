@@ -1,5 +1,0 @@
-[server]
-port = 8000
-
-[log]
-level = "trace"

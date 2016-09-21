@@ -1,0 +1,9 @@
+[server]
+port = 8000
+
+[log]
+level = "trace"
+
+[auth]
+issuer = "<your iss goes here>"
+secret = "<your secret goes here>"
