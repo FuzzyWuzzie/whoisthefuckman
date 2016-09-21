@@ -70,7 +70,7 @@ module.exports = function(context, router) {
             next(error);
         });
     };
-    router.post('/', controllers.add);
+    router.post('/', context.auth, controllers.add);
 
     return controllers;
 }
