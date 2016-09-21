@@ -2,7 +2,6 @@ module.exports = function(router, db, models, log) {
     var controllers = {};
 
     controllers.listAll = function(req, res, next) {
-        log.trace("listing all actors");
         models.actor.findAll()
             .then(function(actors) {
                 res.json(actors);
@@ -25,14 +24,12 @@ module.exports = function(router, db, models, log) {
                 throw ActorNotFound;
             actor = act;
             res.json({
-                success: true,
                 actor: actor
             });
         })
         .catch(function(error) {
             if(error === ActorNotFound) {
                 res.status(404).json({
-                    success: false,
                     message: "actor not found"
                 });
             }
@@ -55,14 +52,13 @@ module.exports = function(router, db, models, log) {
             .then(function(movies) {
                 actor.movies = movies;
                 res.json({
-                    success: true,
                     actor: actor,
+                    movies: movies
                 });
             })
             .catch(function(error) {
                 if(error === ActorNotFound) {
                     res.status(404).json({
-                        success: false,
                         message: "actor not found"
                     });
                 }
@@ -79,7 +75,6 @@ module.exports = function(router, db, models, log) {
         })
         .then(function(actor) {
             res.json({
-                success: true,
                 actor: actor
             });
         })

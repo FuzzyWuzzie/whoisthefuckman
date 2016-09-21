@@ -53,13 +53,13 @@ actors.model = actors.defineModel(db, log);
 // define relationships
 // TODO: locate this somewhere more obvious!
 actors.model.belongsToMany(movies.model, { through: 'ActorMovie' });
+movies.model.belongsToMany(actors.model, { through: 'ActorMovie' });
 
 // store all our models in one place
 var models = {
     movie: movies.model,
     actor: actors.model
 };
-log.trace({ models: Object.keys(models) });
 
 // setup the routes
 movies.router = movies.setupRouter(app);
@@ -72,15 +72,15 @@ actors.engageControllers(actors.router, db, models, log);
 // deal with unhandled routes gracefully
 app.use(function(req, res, next) {
     res.status(404).json({
-        success: false
+        message: "endpoint not found"
     });
 });
 
 // deal with errors gracefully
 app.use(function(err, req, res, next) {
-    log.error({ error: err });
+    log.error("error", err);
     res.status(500).json({
-        success: false
+        message: "internal server error"
     });
 });
 
