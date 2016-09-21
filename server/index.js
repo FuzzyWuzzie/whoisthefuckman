@@ -36,14 +36,20 @@ var db = new sequelize('data', '', '', {
 var app = express();
 var port = config.server.port;
 
-// prepare authorization for all routes!
-app.use(jwt({
-    secret: new Buffer(config.auth.secret, 'base64'),
-    issuer: config.auth.issuer
-}));
-
 //  parse bodies as JSON data
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// create a global context for our controllers
+context = {
+    app: app,
+    config: config,
+    db: db,
+    log: log,
+    auth: jwt({
+        secret: new Buffer(config.auth.secret, 'base64'),
+        issuer: config.auth.issuer
+    })
+};
 
 // load our components
 var movies = require('./movies');
@@ -59,7 +65,7 @@ actors.model.belongsToMany(movies.model, { through: 'ActorMovie' });
 movies.model.belongsToMany(actors.model, { through: 'ActorMovie' });
 
 // store all our models in one place
-var models = {
+context.models = {
     movie: movies.model,
     actor: actors.model
 };
@@ -69,8 +75,8 @@ movies.router = movies.setupRouter(app);
 actors.router = actors.setupRouter(app);
 
 // and start our controllers
-movies.engageControllers(movies.router, db, models, log);
-actors.engageControllers(actors.router, db, models, log);
+movies.engageControllers(context, movies.router);
+actors.engageControllers(context, actors.router);
 
 // deal with unhandled routes gracefully
 app.use(function(req, res, next) {

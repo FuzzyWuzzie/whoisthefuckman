@@ -1,20 +1,18 @@
-module.exports = function(router, db, models, log) {
+module.exports = function(context, router) {
     var controllers = {};
 
     controllers.listAll = function(req, res, next) {
-        models.actor.findAll()
+        context.models.actor.findAll()
             .then(function(actors) {
                 res.json(actors);
             });
     };
-    // TODO: this is a debug function
-    // disable it for production
     router.get('/', controllers.listAll);
 
     controllers.getActor = function(req, res, next) {
         var ActorNotFound = {};
         var actor;
-        models.actor.find({
+        context.models.actor.find({
             where: {
                 id: req.params.actor_id
             }
@@ -69,7 +67,7 @@ module.exports = function(router, db, models, log) {
     router.get('/:actor_id/movies', controllers.getMovies);
 
     controllers.add = function(req, res, next) {
-        models.actor.create({
+        context.models.actor.create({
             name: req.body.name,
             imdb: req.body.imdb
         })

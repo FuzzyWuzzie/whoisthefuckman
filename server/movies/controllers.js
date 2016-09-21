@@ -1,8 +1,8 @@
-module.exports = function(router, db, models, log) {
+module.exports = function(context, router) {
     var controllers = {};
 
     controllers.listAll = function(req, res, next) {
-        models.movie.findAll()
+        context.models.movie.findAll()
             .then(function(movies) {
                 res.json(movies);
             });
@@ -13,8 +13,7 @@ module.exports = function(router, db, models, log) {
 
     controllers.getMovie = function(req, res, next) {
         var MovieNotFound = {};
-        var movie;
-        models.movie.find({
+        context.models.movie.find({
             where: {
                 id: req.params.movie_id
             }
@@ -41,12 +40,10 @@ module.exports = function(router, db, models, log) {
 
     controllers.getActors = function(req, res, next) {
         var MovieNotFound = {};
-        var movie;
-        models.movie.findById(req.params.movie_id)
-            .then(function(mov) {
-                if(mov == null)
+        context.models.movie.findById(req.params.movie_id)
+            .then(function(movie) {
+                if(movie == null)
                     throw MovieNotFound;
-                movie = mov;
                 return movie.getActors();
             })
             .then(function(actors) {
@@ -69,16 +66,16 @@ module.exports = function(router, db, models, log) {
     router.get('/:movie_id/actors', controllers.getActors);
 
     controllers.add = function(req, res, next) {
-        db.transaction(function(t) {
+        context.db.transaction(function(t) {
             var result = {};
-            return models.movie.create({
+            return context.models.movie.create({
                 title: req.body.title,
                 imdb: req.body.imdb,
                 year: req.body.year
             }, {transaction: t})
             .then(function(movie) {
                 result.movie = movie;
-                return models.actor.findAll({
+                return context.models.actor.findAll({
                     where: {
                         id: {
                             $in: JSON.parse(req.body.actors)

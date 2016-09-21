@@ -12,7 +12,7 @@ exports.setupRouter = function(app) {
     return router;
 };
 
-exports.engageControllers = function(router, db, models, log) {
-    return Controllers(router, db, models, log);
+exports.engageControllers = function(context, router) {
+    return Controllers(context, router);
 }
 
