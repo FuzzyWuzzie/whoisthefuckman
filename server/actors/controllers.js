@@ -4,24 +4,22 @@ module.exports = function(context, router) {
     controllers.listAll = function(req, res, next) {
         context.models.actor.findAll()
             .then(function(actors) {
-                res.json(actors);
+                res.json(actors.map(context.sanitize.actor));
             });
     };
     router.get('/', controllers.listAll);
 
     controllers.getActor = function(req, res, next) {
         var ActorNotFound = {};
-        var actor;
         context.models.actor.find({
             where: {
                 id: req.params.actor_id
             }
         })
-        .then(function(act) {
-            if(act == null)
+        .then(function(actor) {
+            if(actor == null)
                 throw ActorNotFound;
-            actor = act;
-            res.json(actor);
+            res.json(context.sanitize.actor(actor));
         })
         .catch(function(error) {
             if(error === ActorNotFound) {
@@ -44,7 +42,7 @@ module.exports = function(context, router) {
                 return actor.getMovies();
             })
             .then(function(movies) {
-                res.json(movies);
+                res.json(movies.map(context.sanitize.movie));
             })
             .catch(function(error) {
                 if(error === ActorNotFound) {
@@ -64,7 +62,7 @@ module.exports = function(context, router) {
             imdb: req.body.imdb
         })
         .then(function(actor) {
-            res.json(actor);
+            res.json(context.sanitize.actor(actor));
         })
         .catch(function(error) {
             next(error);

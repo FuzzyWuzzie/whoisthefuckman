@@ -4,7 +4,7 @@ module.exports = function(context, router) {
     controllers.listAll = function(req, res, next) {
         context.models.movie.findAll()
             .then(function(movies) {
-                res.json(movies);
+                res.json(movies.map(context.sanitize.movie));
             });
     };
     router.get('/', controllers.listAll);
@@ -19,7 +19,7 @@ module.exports = function(context, router) {
         .then(function(movie) {
             if(movie == null)
                 throw MovieNotFound;
-            res.json(movie);
+            res.json(context.sanitize.movie(movie));
         })
         .catch(function(error) {
             if(error === MovieNotFound) {
@@ -42,7 +42,7 @@ module.exports = function(context, router) {
                 return movie.getActors();
             })
             .then(function(actors) {
-                res.json(actors);
+                res.json(actors.map(context.sanitize.actor));
             })
             .catch(function(error) {
                 if(error === MovieNotFound) {
@@ -83,7 +83,7 @@ module.exports = function(context, router) {
             });
         })
         .then(function(result) {
-            res.json(result.movie);
+            res.json(context.sanitize.movie(result.movie));
         })
         .catch(function(error) {
             next(error);

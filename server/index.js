@@ -37,6 +37,7 @@ var app = express();
 var port = config.server.port;
 
 //  parse bodies as JSON data
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // create a global context for our controllers
@@ -69,6 +70,13 @@ context.models = {
     movie: movies.model,
     actor: actors.model
 };
+
+movies.sanitize = movies.getSanitizer();
+actors.sanitize = actors.getSanitizer();
+context.sanitize = {
+    movie: movies.sanitize,
+    actor: actors.sanitize
+}
 
 // setup the routes
 movies.router = movies.setupRouter(app);
