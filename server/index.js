@@ -3,7 +3,7 @@ var bunyan = require('bunyan');
 var express = require('express');
 var bodyParser = require('body-parser');
 var sequelize = require('sequelize');
-var passport = require('passport');
+var jwt = require('express-jwt');
 
 // load configuration
 require('toml-require').install();
@@ -16,7 +16,6 @@ var log = bunyan.createLogger({
             ? "info"
             : config.log.level
 });
-log.info("loaded configuration", config);
 
 // connect to the db
 var db = new sequelize('data', '', '', {
@@ -37,10 +36,14 @@ var db = new sequelize('data', '', '', {
 var app = express();
 var port = config.server.port;
 
-// throw in some middleware
-app.use(bodyParser.urlencoded({
-    extended: true
+// prepare authorization for all routes!
+app.use(jwt({
+    secret: new Buffer(config.auth.secret, 'base64'),
+    issuer: config.auth.issuer
 }));
+
+//  parse bodies as JSON data
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // load our components
 var movies = require('./movies');
@@ -74,6 +77,16 @@ app.use(function(req, res, next) {
     res.status(404).json({
         message: "endpoint not found"
     });
+});
+
+// handle unauthorized errors
+app.use(function(err, req, res, next) {
+    if(err.name === 'UnauthorizedError')
+        res.status(401).json({
+            message: "unauthorized"
+        });
+    else
+        next(err);
 });
 
 // deal with errors gracefully
