@@ -21,9 +21,7 @@ module.exports = function(context, router) {
             if(act == null)
                 throw ActorNotFound;
             actor = act;
-            res.json({
-                actor: actor
-            });
+            res.json(actor);
         })
         .catch(function(error) {
             if(error === ActorNotFound) {
@@ -39,20 +37,14 @@ module.exports = function(context, router) {
 
     controllers.getMovies = function(req, res, next) {
         var ActorNotFound = {};
-        var actor;
-        models.actor.actor.findById(req.params.actor_id)
-            .then(function(act) {
-                if(act == null)
+        context.models.actor.actor.findById(req.params.actor_id)
+            .then(function(actor) {
+                if(actor == null)
                     throw ActorNotFound;
-                actor = act;
                 return actor.getMovies();
             })
             .then(function(movies) {
-                actor.movies = movies;
-                res.json({
-                    actor: actor,
-                    movies: movies
-                });
+                res.json(movies);
             })
             .catch(function(error) {
                 if(error === ActorNotFound) {
@@ -72,9 +64,7 @@ module.exports = function(context, router) {
             imdb: req.body.imdb
         })
         .then(function(actor) {
-            res.json({
-                actor: actor
-            });
+            res.json(actor);
         })
         .catch(function(error) {
             next(error);

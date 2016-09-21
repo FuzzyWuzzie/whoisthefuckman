@@ -7,8 +7,6 @@ module.exports = function(context, router) {
                 res.json(movies);
             });
     };
-    // TODO: this is a debug function
-    // disable it for production
     router.get('/', controllers.listAll);
 
     controllers.getMovie = function(req, res, next) {
@@ -18,13 +16,10 @@ module.exports = function(context, router) {
                 id: req.params.movie_id
             }
         })
-        .then(function(mov) {
-            if(mov == null)
+        .then(function(movie) {
+            if(movie == null)
                 throw MovieNotFound;
-            movie = mov;
-            res.json({
-                movie: movie
-            });
+            res.json(movie);
         })
         .catch(function(error) {
             if(error === MovieNotFound) {
@@ -47,11 +42,7 @@ module.exports = function(context, router) {
                 return movie.getActors();
             })
             .then(function(actors) {
-                movie.actors = actors;
-                res.json({
-                    movie: movie,
-                    actors: actors
-                });
+                res.json(actors);
             })
             .catch(function(error) {
                 if(error === MovieNotFound) {
@@ -92,7 +83,7 @@ module.exports = function(context, router) {
             });
         })
         .then(function(result) {
-            res.json(result);
+            res.json(result.movie);
         })
         .catch(function(error) {
             next(error);
