@@ -2,11 +2,25 @@
 -main Main
 
 -D react_global
+-D AUTH0_CLIENT_ID=ojHF1Gv2lNWJ4eaEMzF7joh6MuKJapHd
+-D AUTH0_DOMAIN=fuzzywuzzie.auth0.com
 
 -lib react
 -lib promhx
 -lib jsoni18n
 
 --macro macros.Assets.copyProjectAssets()
+-dce full
+
+-debug
 
 -js public/app.js
+
+# minify the output
+#--next
+#-cp src
+#--macro macros.Assets.minify("public/app.js")
+
+--next
+
+-cmd http-server -c-1 public/

@@ -36,6 +36,9 @@ class App extends ReactComponentOfState<AppState> {
 			Translation.setLocale(js.Browser.navigator.languages[0]);
 		else
 			Translation.setLocale(js.Browser.navigator.language);
+
+		// and check our login
+		Authenticate.check();
 	}
 
 	override public function componentWillUnmount() {
@@ -48,7 +51,15 @@ class App extends ReactComponentOfState<AppState> {
 			React.createElement("div", null,
 				React.createElement("header", null,
 					React.createElement("h1", null, Translation.get("home/title")),
-					React.createElement("p", null, Translation.get("home/tagline"))),
-				React.createElement("article", null));
+					React.createElement("p", null, Translation.get("home/tagline"))
+				),
+				React.createElement("article", null),
+				React.createElement("footer", null,
+					React.createElement(AuthGreeting, null),
+					React.createElement("p", null,
+						React.createElement(AuthButton, null)
+					)
+				)
+			);
 	}
 }

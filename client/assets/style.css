@@ -28,7 +28,7 @@ h3 {font-size: 1.44em;}
 
 h4 {font-size: 1.2em;}
 
-small, .font_small {font-size: 0.833em;}
+small {font-size: 0.833em;}
 
 /* center and size the body */
 body {
@@ -38,35 +38,26 @@ body {
 }
 
 /* page header and nav */
-body > header {
+body > div > header {
   overflow: auto;
-  font-size: 1.2em;
 }
 
-body > header h1 {
+body > div > header h1 {
   float: left;
-  font-size: 1.2em;
+  margin: 0;
 }
 
-body > header nav {
+body > div > header p {
   float: right;
-}
-
-body > header nav a {
-  margin-left: 0.5em;
-}
-
-body > header {
-  border-bottom: thin solid #f3f3f3;
+  margin: 0;
 }
 
 /* page footer */
-body > footer {
-  border-top: thin solid #f3f3f3;
+body > div > footer {
   text-align: center;
 }
 
-body > footer img {
+body > div > footer img {
   height: 0.75em;
 }
 
@@ -76,24 +67,39 @@ h2 { font-weight: 700; }
 h3 { font-weight: 600; }
 h4 { font-weight: 500; }
 
+/* layout and group the posts on the home page */
+article {
+  margin: 0.75em 0;
+  border-top: thin solid #f3f3f3;
+  border-bottom: thin solid #f3f3f3;
+}
+
+article dt {
+  float: left;
+  clear: left;
+  margin-right: 0.5em;
+}
+
+article dt:after {
+  content: ":";
+}
+
+article dd {
+  margin-bottom: 0.25em;
+}
+
+article p {
+  margin-bottom: 0;
+}
+
 /* link colours! */
-header a, h1 a {
+a {
   color: #333;
   text-decoration: none;
 }
 
-header a:hover, h1 a:hover {
-  color: #bf0a30;
-  text-decoration: none;
-}
-
-a {
-  color: #bf0a30;
-  text-decoration: none;
-}
-
 a:hover, a:focus, a:active {
-  color: #8c0000;
+  color: #bf0a30;
   text-decoration: none;
 }
 
@@ -104,12 +110,7 @@ a:hover, a:focus, a:active {
     color: #000;
   }
 
-  h1 a {
-    color: #000;
-  }
-
   a, a:hover, a:focus, a:active {
-    color: #000;
     text-decoration: underline;
   }
 }

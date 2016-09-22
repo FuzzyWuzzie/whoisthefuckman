@@ -1,5 +1,6 @@
 package macros;
 
+import haxe.Http;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import Sys;
@@ -42,5 +43,32 @@ class Assets {
         // copy it!
         var numCopied = copy(assetSrcFolder, assetsDstFolder);
         Sys.println('copied ${numCopied} project assets to bin!');
+    }
+
+    public static function minify(path:String) {
+        Sys.println('minifying ${path} using closure-compiler...');
+        var src:String = File.getContent(path);
+
+        // prepare the HTML request
+        var h:Http = new Http("http://closure-compiler.appspot.com/compile");
+        h.addHeader("Content-type", "application/x-www-form-urlencoded");
+        h.addParameter("js_code", src);
+        h.addParameter("compilation_level", "SIMPLE_OPTIMIZATIONS");
+        h.addParameter("output_info", "compiled_code");
+        h.addParameter("output_format", "text");
+
+        // receive functions
+        h.onData = function(data:String) {
+            var destination = Path.withoutExtension(path) + ".min.js";
+            File.saveContent(destination, data);
+            Sys.println('minified source saved to ${destination}!');
+            Sys.println('compressed ${Math.fround(src.length/1024.0)}KB to ${Math.fround(data.length/1024.0)}KB, ${Math.fround(100.0*data.length/src.length)}% compression!');
+        }
+        h.onError = function(error:String) {
+            Sys.println('error: ${error}');
+        }
+        h.onStatus = function(status:Int) {}
+
+        h.request(true);
     }
 }
