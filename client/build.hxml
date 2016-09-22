@@ -1,0 +1,12 @@
+-cp src
+-main Main
+
+-D react_global
+
+-lib react
+-lib promhx
+-lib jsoni18n
+
+--macro macros.Assets.copyProjectAssets()
+
+-js public/app.js
