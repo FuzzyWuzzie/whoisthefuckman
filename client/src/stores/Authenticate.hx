@@ -21,7 +21,7 @@ class Authenticate {
 		l;
 	};
 
-	public static var changed:Event = new Event();
+	public static var changed(default, null):Event = new Event();
 
 	public static var authenticated(default, set):Bool = false;
 	private static function set_authenticated(a:Bool):Bool {

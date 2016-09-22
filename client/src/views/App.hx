@@ -53,7 +53,9 @@ class App extends ReactComponentOfState<AppState> {
 					React.createElement("h1", null, Translation.get("home/title")),
 					React.createElement("p", null, Translation.get("home/tagline"))
 				),
-				React.createElement("article", null),
+				React.createElement("article", null,
+					React.createElement(MovieList, null)
+				),
 				React.createElement("footer", null,
 					React.createElement(AuthGreeting, null),
 					React.createElement("p", null,

@@ -7,7 +7,7 @@ import promhx.Promise;
 
 class Translation {
 	private function new() {}
-	public static var changed:Event = new Event();
+	public static var changed(default, null):Event = new Event();
 	public static var locale(default, null):String = {
 		I18n.loadFromString('
 			{

@@ -1,6 +1,7 @@
 // imports
 var bunyan = require('bunyan');
 var express = require('express');
+var cors = require('cors');
 var bodyParser = require('body-parser');
 var sequelize = require('sequelize');
 var jwt = require('express-jwt');
@@ -35,6 +36,12 @@ var db = new sequelize('data', '', '', {
 // initialize the server
 var app = express();
 var port = config.server.port;
+
+// TODO: remove for deploy!
+// enable CORS (for testing)
+app.use(cors({
+    origin: "http://localhost:8080"
+}));
 
 //  parse bodies as JSON data
 app.use(bodyParser.json());
