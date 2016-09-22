@@ -5,4 +5,5 @@ typedef TMovie = {
 	var title:String;
 	var imdb:String;
 	var year:Int;
+	var actorIDs:Array<Int>;
 };

@@ -3,11 +3,12 @@ package views;
 import api.react.React;
 import api.react.ReactComponent;
 import api.react.ReactMacro.jsx;
+import haxe.ds.IntMap;
 import stores.Movies;
 import types.TMovie;
 
 typedef MovieListState = {
-	var movies:Array<TMovie>;
+	var movies:IntMap<TMovie>;
 }
 
 class MovieList extends ReactComponentOfState<MovieListState> {
@@ -40,9 +41,9 @@ class MovieList extends ReactComponentOfState<MovieListState> {
 	private function renderMovieList():Array<ReactComponent> {
 		var components:Array<ReactComponent> = new Array<ReactComponent>();
 
-		for(movie in state.movies) {
+		for(movie in state.movies.iterator()) {
 			components.push(React.createElement(Movie, { movie: movie }));
-			components.push(React.createElement("dd", null, "TODO: actor list"));
+			components.push(React.createElement("dd", null, "[" + movie.actorIDs.join(",") + "]"));
 		}
 
 		return components;
