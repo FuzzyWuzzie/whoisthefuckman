@@ -3,7 +3,7 @@ const Controllers = require('./controllers.js');
 
 exports.setupRouter = function(app) {
     var router = express.Router();
-    app.use('/generator', router);
+    app.use('/generate', router);
     return router;
 };
 

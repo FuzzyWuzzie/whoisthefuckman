@@ -37,18 +37,13 @@ body {
   padding: 0 1em;
 }
 
-/* page header and nav */
-body header {
-  overflow: auto;
-}
-
 body header h1 {
-  float: left;
   margin: 0;
 }
 
 body header p {
-  float: right;
+  width: 100%;
+  text-align: right;
   margin: 0;
 }
 

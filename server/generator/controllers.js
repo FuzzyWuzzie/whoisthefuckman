@@ -4,6 +4,7 @@ var fs = require('fs-extra');
 var minify = require('html-minifier').minify;
 var CleanCSS = require('clean-css');
 var slug = require('slug');
+var extend = require('util')._extend;
 
 fs.readFileAsync = Promise.promisify(fs.readFile);
 fs.writeFileAsync = Promise.promisify(fs.writeFile);
@@ -13,10 +14,14 @@ module.exports = function(context, router) {
     var controllers = {};
 
     controllers.build = function(req, res, next) {
+        // timing!
+        var startTime = new Date();
+
         // save these for future calls
         var partials = {};
         var homeTemplate = "";
-        var homeView = {
+        var actorTemplate = "";
+        var rootView = {
             site: {
                 title: "Who is the Fuck Man?",
                 tag: "A list of actors who get to say 'fuck' in PG-13 movies.",
@@ -29,22 +34,24 @@ module.exports = function(context, router) {
                 }
             }
         };
+        var homeView = extend(rootView, {});
+        var builtPaths = [];
 
+        // do a clean run
+        fs.emptyDirSync("public");
         // make sure our output folders exist
         fs.ensureDirSync("public/assets");
         fs.ensureDirSync("public/actor");
 
-        var compile = function(template, view) {
-            return new Promise(function(resolve, reject) {
-                var output = Mustache.render(template, view, partials);
-                output = minify(output, {
-                    removeComments: true,
-                    removeCommentsFromCDATA: true,
-                    collapseWhitespace: true
-                });
-                context.log.info("rendered output");
-                resolve(output);
+        var compileAndSave = function(template, view, path) {
+            var output = Mustache.render(template, view, partials);
+            output = minify(output, {
+                removeComments: true,
+                removeCommentsFromCDATA: true,
+                collapseWhitespace: true
             });
+            builtPaths.push(path);
+            return fs.writeFileAsync(path, output);
         }
 
         var buildMovie = function(movie) {
@@ -54,6 +61,18 @@ module.exports = function(context, router) {
                         movie.actors = actors;
                         movie.actors[movie.actors.length - 1].last = true;
                         resolve(movie);
+                    })
+                    .catch(reject);
+            });
+        }
+
+        var buildActor = function(actor) {
+            return new Promise(function(resolve, reject) {
+                actor.getMovies()
+                    .then(function(movies) {
+                        actor.movies = movies;
+                        actor.movies[actor.movies.length - 1].last = true;
+                        resolve(actor);
                     })
                     .catch(reject);
             });
@@ -86,22 +105,42 @@ module.exports = function(context, router) {
             })
             .then(function(movies) {
                 homeView.movies = movies;
-                return compile(homeTemplate, homeView);
-            })
-            .then(function(homeOutput) {
-                // write the file out
-                return fs.writeFileAsync("public/index.html", homeOutput);
+                return compileAndSave(homeTemplate, homeView, "public/index.html");
             })
             .then(function() {
+                // read the actor template
+                return fs.readFileAsync("templates/actor.mustache", 'utf8')
+            })
+            .then(function(contents) {
+                actorTemplate = contents;
+                return context.models.actor.findAll();
+            })
+            .then(function(actors) {
+                var actorPromises = actors.map(buildActor);
+                return Promise.all(actorPromises);
+            })
+            .then(function(actors) {
+                var actorCompilePromises = actors.map(function(actor) {
+                    var view = extend(rootView, {
+                        actor: actor
+                    });
+                    return compileAndSave(actorTemplate, view, "public/actor/" + slug(actor.name) + ".html")
+                });
+                return Promise.all(actorCompilePromises);
+            })
+            /*.then(function(arr) {
+
+            })*/
+            .then(function() {
                 // copy the asset files
+                builtPaths.push("public/assets/");
                 return fs.copyAsync("assets", "public/assets");
             })
             .then(function() {
                 res.json({
-                    paths: [
-                        "public/index.html"
-                    ]
-                })
+                    paths: builtPaths.map(function(path) { return path.substr(6); }),
+                    time: (new Date() - startTime) + "ms"
+                });
             })
             .catch(function(error) {
                 context.log.error("failed to load templates", error);
@@ -110,8 +149,8 @@ module.exports = function(context, router) {
                 });
             });
     };
-    //router.post('/', context.auth, controllers.build);
-    router.post('/', controllers.build);
+    router.post('/', context.auth, controllers.build);
+    //router.post('/', controllers.build); // for testing only
 
     return controllers;
 }

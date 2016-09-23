@@ -6,25 +6,29 @@
   <title>{{site.title}} {{actor.name}} is.</title>
   <meta property="og:title" content="{{site.title}} {{actor.name}} is." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://{{ site.root }}/actor/{{#slugify}}{{actor.name}}{{/slugify}}.html" />
-  <meta property="og:description" content="{{ actor.name }} is the Fuck Man in: " />
+  <meta property="og:url" content="https://{{site.root}}/actor/{{#slugify}}{{actor.name}}{{/slugify}}.html" />
+  <meta property="og:description" content="{{actor.name}} is the Fuck Man in: TODO" />
   <meta property="og:locale" content="en_CA" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="{{ site.twitter }}" />
+  <meta name="twitter:site" content="{{site.twitter}}" />
   <meta name="twitter:title" content="{{site.title}} {{actor.name}} is." />
-  <meta name="twitter:description" content="{{ actor.name }} is the Fuck Man in: {% for movie in actor.movies %}{{ movie.title }}{% if movie.year %} ({{ movie.year }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}" />
+  <meta name="twitter:description" content="{{actor.name}} is the Fuck Man in: TODO" />
   <style>{{>style}}</style>
+  {{>header}}
 </head>
 <body>
-  {{>header}}
-  <table>
-    {{#movies}}
-    <tr>
-      <td>{{title}}{{#year}} ({{year}}){{/year}}</td>
-      <td><ul>{{#actors}}<li><a href="/actor/{{#slugify}}{{name}}{{/slugify}}.html">{{name}}</a></li>{{/actors}}</ul></td>
-    </tr>
-    {{/movies}}
-  </table>
+  <header>
+    <h1><a href="/">{{site.title}}</a></h1>
+    <p>{{actor.name}} is.</p>
+  </header>
+  <article>
+    <p>Movies where {{#actor.imdb}}<a href="{{actor.imdb}}">{{/actor.imdb}}{{actor.name}}{{#actor.imdb}}</a>{{/actor.imdb}} is the Fuck Man:</p>
+    <ul>
+      {{#actor.movies}}
+      <li>{{title}}{{#year}} ({{year}}){{/year}}</li>
+      {{/actor.movies}}
+    </ul>
+  </article>
   {{>footer}}
 </body>
 </html>
