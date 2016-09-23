@@ -5,6 +5,7 @@ var cors = require('cors');
 var bodyParser = require('body-parser');
 var sequelize = require('sequelize');
 var jwt = require('express-jwt');
+var compression = require('compression');
 
 // load configuration
 require('toml-require').install();
@@ -47,6 +48,12 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// enable gzip compression
+app.use(compression());
+
+// enable a static folder
+app.use(express.static('public'));
+
 // create a global context for our controllers
 context = {
     app: app,
@@ -62,6 +69,7 @@ context = {
 // load our components
 var movies = require('./movies');
 var actors = require('./actors');
+var generator = require('./generator');
 
 // setup our models
 movies.model = movies.defineModel(db, log);
@@ -88,10 +96,12 @@ context.sanitize = {
 // setup the routes
 movies.router = movies.setupRouter(app);
 actors.router = actors.setupRouter(app);
+generator.router = generator.setupRouter(app);
 
 // and start our controllers
 movies.engageControllers(context, movies.router);
 actors.engageControllers(context, actors.router);
+generator.engageControllers(context, generator.router);
 
 // deal with unhandled routes gracefully
 app.use(function(req, res, next) {
