@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Who is the Fuck Man in {{movie.title}}?</title>
+  <meta property="og:title" content="Who is the Fuck Man in {{movie.title}}?" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://whoisthefuckman.com/movie/{{#slugify}}{{movie.title}}{{/slugify}}.html" />
+  <meta property="og:description" content="The Fuck Man in {{movie.title}} is: {{#actors}}{{name}}{{^last}}, {{/last}}{{/actors}}" />
+  <meta property="og:locale" content="en" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@KentonHam" />
+  <meta name="twitter:title" content="Who is the Fuck Man in {{movie.title}}?" />
+  <meta name="twitter:description" content="The Fuck Man in {{movie.title}} is: {{#actors}}{{name}}{{^last}}, {{/last}}{{/actors}}" />
+  <style>{{>style}}</style>
+  {{>header}}
+</head>
+<body>
+  <header>
+    <h1><a href="/">Who is the Fuck Man?</a></h1>
+    <p>{{#actors}}<a href="/actor/{{#slugify}}{{name}}{{/slugify}}.html">{{name}}</a>{{^last}}, {{/last}}{{/actors}}{{^actors}}&nbsp;{{/actors}}</p>
+  </header>
+  <article>
+    <h2>{{movie.title}}</h2>
+    {{#movie.image_path}}
+      <figure>
+        <img src="{{mdb.images.secure_base_url}}{{mdb.images.poster_size}}{{movie.image_path}}">
+      </figure>
+    {{/movie.image_path}}
+    {{#movie.overview}}<p>{{movie.overview}}</p>{{/movie.overview}}
+    <p>And the Fuck Man in {{movie.title}} is: {{#movie.actors}}<a href="/actor/{{#slugify}}{{name}}{{/slugify}}.html">{{name}}</a>{{^last}}, {{/last}}{{/movie.actors}}{{^movie.actors}}&nbsp;{{/movie.actors}}</p>
+  </article>
+  {{>footer}}
+</body>
+</html>

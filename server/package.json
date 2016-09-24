@@ -20,6 +20,8 @@
     "express-jwt": "^5.0.0",
     "fs-extra": "^0.30.0",
     "html-minifier": "^3.0.3",
+    "moment": "^2.15.1",
+    "moviedb": "^0.2.5",
     "mu2": "^0.5.21",
     "mustache": "^2.2.1",
     "sequelize": "^3.24.3",

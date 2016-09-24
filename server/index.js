@@ -30,7 +30,7 @@ var db = new sequelize('data', '', '', {
     },
     storage: 'whoisthefuckman.db',
     logging: function(query) {
-        log.debug("db query", { query: query });
+        log.trace("db query", { query: query });
     }
 });
 
@@ -94,9 +94,11 @@ context.sanitize = {
 }
 
 // setup the routes
-movies.router = movies.setupRouter(app);
-actors.router = actors.setupRouter(app);
-generator.router = generator.setupRouter(app);
+var apiRouter = express.Router();
+app.use('/api/v1', apiRouter);
+movies.router = movies.setupRouter(apiRouter);
+actors.router = actors.setupRouter(apiRouter);
+generator.router = generator.setupRouter(apiRouter);
 
 // and start our controllers
 movies.engageControllers(context, movies.router);

@@ -7,3 +7,6 @@ level = "trace"
 [auth]
 issuer = "<your iss goes here>"
 secret = "<your secret goes here>"
+
+[tmdb]
+key = "<api key from the movie db goes here>"

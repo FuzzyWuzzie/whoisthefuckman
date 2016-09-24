@@ -5,6 +5,8 @@ var minify = require('html-minifier').minify;
 var CleanCSS = require('clean-css');
 var slug = require('slug');
 var extend = require('util')._extend;
+var moment = require('moment');
+var MovieDB = require('moviedb');
 
 fs.readFileAsync = Promise.promisify(fs.readFile);
 fs.writeFileAsync = Promise.promisify(fs.writeFile);
@@ -12,6 +14,7 @@ fs.copyAsync = Promise.promisify(fs.copy);
 
 module.exports = function(context, router) {
     var controllers = {};
+    var mdb = Promise.promisifyAll(MovieDB(context.config.tmdb.key));
 
     controllers.build = function(req, res, next) {
         // timing!
@@ -21,27 +24,33 @@ module.exports = function(context, router) {
         var partials = {};
         var homeTemplate = "";
         var actorTemplate = "";
+        var movieTemplate = "";
         var rootView = {
-            site: {
-                title: "Who is the Fuck Man?",
-                tag: "A list of actors who get to say 'fuck' in PG-13 movies.",
-                root: "whoisthefuckman.com",
-                twitter: "@KentonHam"
-            },
             slugify: function() {
                 return function(text, render) {
                     return slug(render(text));
                 }
+            },
+            datetime: function() {
+                return function(text, render) {
+                    return moment(render(text)).format('YYYY-MM-DDTHH:mm:ssZ');
+                }
+            },
+            extract_year: function() {
+                return function(text, render) {
+                    return moment(render(text)).year();
+                }
             }
         };
-        var homeView = extend(rootView, {});
         var builtPaths = [];
+        var data = {};
 
         // do a clean run
         fs.emptyDirSync("public");
         // make sure our output folders exist
         fs.ensureDirSync("public/assets");
         fs.ensureDirSync("public/actor");
+        fs.ensureDirSync("public/movie");
 
         var compileAndSave = function(template, view, path) {
             var output = Mustache.render(template, view, partials);
@@ -59,7 +68,12 @@ module.exports = function(context, router) {
                 movie.getActors()
                     .then(function(actors) {
                         movie.actors = actors;
-                        movie.actors[movie.actors.length - 1].last = true;
+                        if(movie.actors && movie.actors.length > 0) {
+                            movie.actors[movie.actors.length - 1].last = true;
+                            movie.hidden = false;
+                        }
+                        else
+                            movie.hidden = true;
                         resolve(movie);
                     })
                     .catch(reject);
@@ -71,21 +85,31 @@ module.exports = function(context, router) {
                 actor.getMovies()
                     .then(function(movies) {
                         actor.movies = movies;
-                        actor.movies[actor.movies.length - 1].last = true;
+                        if(actor.movies.length > 0) actor.movies[actor.movies.length - 1].last = true;
                         resolve(actor);
                     })
                     .catch(reject);
             });
         }
 
-        // load our partials
-        var partialPromises = [
-            fs.readFileAsync("templates/header.mustache", 'utf8'),
-            fs.readFileAsync("templates/style.css", 'utf8'),
-            fs.readFileAsync("templates/footer.mustache", 'utf8'),
-            fs.readFileAsync("templates/analytics.mustache", 'utf8')
-        ];
-        Promise.all(partialPromises)
+        // load the mdb config
+        mdb.configurationAsync()
+            .then(function(configuration) {
+                rootView.mdb = {
+                    images: configuration.images
+                };
+                rootView.mdb.images.profile_size = configuration.images.profile_sizes[1];
+                rootView.mdb.images.poster_size = configuration.images.poster_sizes[2];
+
+                // load our partials
+                var partialPromises = [
+                    fs.readFileAsync("templates/header.mustache", 'utf8'),
+                    fs.readFileAsync("templates/style.css", 'utf8'),
+                    fs.readFileAsync("templates/footer.mustache", 'utf8'),
+                    fs.readFileAsync("templates/analytics.mustache", 'utf8')
+                ];
+                return Promise.all(partialPromises)
+            })
             .then(function(pa) {
                 partials.header = pa[0];
                 partials.style = new CleanCSS().minify(pa[1]).styles;
@@ -104,11 +128,25 @@ module.exports = function(context, router) {
                 return Promise.all(moviePromises);
             })
             .then(function(movies) {
-                homeView.movies = movies;
-                return compileAndSave(homeTemplate, homeView, "public/index.html");
+                data.movies = movies;
+                return compileAndSave(homeTemplate, extend(rootView, {
+                    movies: movies
+                }), "public/index.html");
             })
             .then(function() {
-                // read the actor template
+                return fs.readFileAsync("templates/movie.mustache", 'utf8')
+            })
+            .then(function(contents) {
+                movieTemplate = contents;
+                var movieCompilePromises = data.movies.map(function(movie) {
+                    var view = extend(rootView, {
+                        movie: movie
+                    });
+                    return compileAndSave(movieTemplate, view, "public/movie/" + slug(movie.title) + ".html")
+                });
+                return Promise.all(movieCompilePromises);
+            })
+            .then(function() {
                 return fs.readFileAsync("templates/actor.mustache", 'utf8')
             })
             .then(function(contents) {
@@ -128,9 +166,6 @@ module.exports = function(context, router) {
                 });
                 return Promise.all(actorCompilePromises);
             })
-            /*.then(function(arr) {
-
-            })*/
             .then(function() {
                 // copy the asset files
                 builtPaths.push("public/assets/");
@@ -150,7 +185,6 @@ module.exports = function(context, router) {
             });
     };
     router.post('/', context.auth, controllers.build);
-    //router.post('/', controllers.build); // for testing only
 
     return controllers;
 }

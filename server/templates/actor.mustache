@@ -3,29 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{site.title}} {{actor.name}} is.</title>
-  <meta property="og:title" content="{{site.title}} {{actor.name}} is." />
+  <title>Who is the Fuck Man? {{actor.name}} is.</title>
+  <meta property="og:title" content="Who is the Fuck Man? {{actor.name}} is." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://{{site.root}}/actor/{{#slugify}}{{actor.name}}{{/slugify}}.html" />
-  <meta property="og:description" content="{{actor.name}} is the Fuck Man in: TODO" />
-  <meta property="og:locale" content="en_CA" />
+  <meta property="og:url" content="https://whoisthefuckman.com/actor/{{#slugify}}{{actor.name}}{{/slugify}}.html" />
+  <meta property="og:description" content="{{actor.name}} is the Fuck Man in: {{#actor.movies}}{{title}}{{#release_date}} ({{#extract_year}}{{release_date}}{{/extract_year}}){{/release_date}}{{/actor.movies}}" />
+  <meta property="og:locale" content="en" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="{{site.twitter}}" />
-  <meta name="twitter:title" content="{{site.title}} {{actor.name}} is." />
-  <meta name="twitter:description" content="{{actor.name}} is the Fuck Man in: TODO" />
+  <meta name="twitter:site" content="@KentonHam" />
+  <meta name="twitter:title" content="Who is the Fuck Man? {{actor.name}} is." />
+  <meta name="twitter:description" content="{{actor.name}} is the Fuck Man in: {{#actor.movies}}{{title}}{{#release_date}} ({{#extract_year}}{{release_date}}{{/extract_year}}){{/release_date}}{{/actor.movies}}" />
   <style>{{>style}}</style>
   {{>header}}
 </head>
 <body>
   <header>
-    <h1><a href="/">{{site.title}}</a></h1>
+    <h1><a href="/">Who is the Fuck Man?</a></h1>
     <p>{{actor.name}} is.</p>
   </header>
   <article>
-    <p>Movies where {{#actor.imdb}}<a href="{{actor.imdb}}">{{/actor.imdb}}{{actor.name}}{{#actor.imdb}}</a>{{/actor.imdb}} is the Fuck Man:</p>
+    <h2>{{actor.name}}</h2>
+    {{#actor.image_path}}
+      <figure>
+        <img src="{{mdb.images.secure_base_url}}{{mdb.images.profile_size}}{{actor.image_path}}">
+      </figure>
+    {{/actor.image_path}}
+    {{#actor.biography}}<p>{{actor.biography}}</p>{{/actor.biography}}
+    <p>{{actor.name}} is also the Fuck Man in:</p>
     <ul>
       {{#actor.movies}}
-      <li>{{title}}{{#year}} ({{year}}){{/year}}</li>
+      <li><a href="/movie/{{#slugify}}{{title}}{{/slugify}}.html">{{title}}</a>{{#release_date}} (<time datetime="{{#datetime}}{{release_date}}{{/datetime}}">{{#extract_year}}{{release_date}}{{/extract_year}}</time>){{/release_date}}</li>
       {{/actor.movies}}
     </ul>
   </article>

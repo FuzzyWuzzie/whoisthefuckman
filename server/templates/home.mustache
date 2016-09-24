@@ -3,30 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{site.title}}</title>
-  <meta property="og:title" content="{{ site.title }}" />
+  <title>Who is the Fuck Man?</title>
+  <meta property="og:title" content="Who is the Fuck Man?" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://{{ site.root }}" />
-  <meta property="og:description" content="{{ site.tag }}" />
-  <meta property="og:locale" content="en_CA" />
+  <meta property="og:url" content="https://whoisthefuckman.com" />
+  <meta property="og:description" content="A list of actors who get to say 'fuck' in PG-13 movies." />
+  <meta property="og:locale" content="en" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="{{ site.twitter }}" />
-  <meta name="twitter:title" content="{{ site.title }}" />
-  <meta name="twitter:description" content="{{ site.tag }}" />
+  <meta name="twitter:site" content="@KentonHam" />
+  <meta name="twitter:title" content="Who is the Fuck Man?" />
+  <meta name="twitter:description" content="A list of actors who get to say 'fuck' in PG-13 movies." />
   <style>{{>style}}</style>
   {{>header}}
 </head>
 <body>
   <header>
-    <h1><a href="/">{{site.title}}</a></h1>
-    <p>{{site.tag}}</p>
+    <h1><a href="/">Who is the Fuck Man?</a></h1>
+    <p>A list of actors who get to say 'fuck' in PG-13 movies.</p>
   </header>
   <article>
     <dl>
-      {{#movies}}
-      <dt>{{title}}{{#year}} ({{year}}){{/year}}</dt>
-      <dl>{{#actors}}<a href="/actor/{{#slugify}}{{name}}{{/slugify}}.html">{{name}}</a>{{^last}}, {{/last}}{{/actors}}</dl>
-      {{/movies}}
+      {{#movies}}{{^hidden}}
+      <dt><a href="/movie/{{#slugify}}{{title}}{{/slugify}}.html">{{title}}</a>{{#release_date}} (<time datetime="{{#datetime}}{{release_date}}{{/datetime}}">{{#extract_year}}{{release_date}}{{/extract_year}}</time>){{/release_date}}</dt>
+      <dd>{{#actors}}<a href="/actor/{{#slugify}}{{name}}{{/slugify}}.html">{{name}}</a>{{^last}}, {{/last}}{{/actors}}{{^actors}}&nbsp;{{/actors}}</dd>
+      {{/hidden}}{{/movies}}
     </dl>
   </article>
   {{>footer}}

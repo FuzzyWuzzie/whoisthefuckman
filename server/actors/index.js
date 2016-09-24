@@ -12,7 +12,7 @@ exports.getSanitizer = function() {
 
 exports.setupRouter = function(app) {
     var router = express.Router();
-    app.use('/actors', router);
+    app.use('/actor', router);
     return router;
 };
 

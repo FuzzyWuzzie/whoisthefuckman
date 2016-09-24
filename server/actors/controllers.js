@@ -1,5 +1,9 @@
+var Promise = require('bluebird');
+var MovieDB = require('moviedb');
+
 module.exports = function(context, router) {
     var controllers = {};
+    var mdb = Promise.promisifyAll(MovieDB(context.config.tmdb.key));
 
     controllers.listAll = function(req, res, next) {
         context.models.actor.findAll()
@@ -56,19 +60,40 @@ module.exports = function(context, router) {
     };
     router.get('/:actor_id/movies', controllers.getMovies);
 
-    controllers.add = function(req, res, next) {
-        context.models.actor.create({
-            name: req.body.name,
-            imdb: req.body.imdb
-        })
-        .then(function(actor) {
-            res.json(context.sanitize.actor(actor));
-        })
-        .catch(function(error) {
-            next(error);
-        });
-    };
-    router.post('/', context.auth, controllers.add);
+    controllers.upsert = function(req, res, next) {
+        if(!req.body.id) {
+            res.status(400).json({
+                message: "you need an `id` parameter!"
+            });
+            return;
+        }
 
+        mdb.personInfoAsync({id: req.body.id})
+            .then(function(person) {
+                return context.models.actor.upsert({
+                    id: person.id,
+                    name: person.name,
+                    biography: person.biography,
+                    image_path: person.profile_path
+                });
+            })
+            .then(function(created) {
+                return context.models.actor.findById(req.body.id);
+            })
+            .then(function(actor) {
+                res.json(context.sanitize.actor(actor));
+            })
+            .catch(function(error) {
+                if(error.status && error.status === 404) {
+                    res.status(404).json({
+                        message: "actor wasn't found!"
+                    });
+                }
+                else
+                    next(error);
+            });
+    };
+    router.post('/', context.auth, controllers.upsert);
+    
     return controllers;
 }
