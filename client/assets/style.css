@@ -74,22 +74,42 @@ article {
   border-bottom: thin solid #f3f3f3;
 }
 
-article dt {
+article > dl > dt {
   float: left;
   clear: left;
   margin-right: 0.5em;
 }
 
-article dt:after {
+article > dl > dt:after {
   content: ":";
 }
 
-article dd {
+article > dl > dd {
   margin-bottom: 0.25em;
 }
 
-article p {
-  margin-bottom: 0;
+article > ul {
+  list-style: none;
+  padding: 0;
+}
+
+article > ul > li {
+  padding-left: 1.3em;
+}
+
+article > ul > li:before {
+  font-family: FontAwesome;
+  display: inline-block;
+  margin-left: -1.3em; /* same as padding-left set on li */
+  width: 1.3em; /* same as padding-left set on li */
+}
+
+article > ul > li.unexpanded:before {
+  content: "\f152"; /* FontAwesome Unicode */
+}
+
+article > ul > li.expanded:before {
+  content: "\f150"; /* FontAwesome Unicode */
 }
 
 /* link colours! */

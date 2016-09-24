@@ -17,12 +17,12 @@ class Movies {
 
 	private static function queryActorIDs(movieID:Int) {
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("GET", 'http://localhost:8000/movies/${movieID}/actors', true);
+		xhr.open("GET", 'http://localhost:8000/api/v1/movie/${movieID}', true);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;
 		xhr.onload = function() {
 			if(xhr.status >= 200 && xhr.status < 300) {
 				// parse it
-				var actorList:Array<TActor> = cast xhr.response;
+				var actorList:Array<TActor> = cast xhr.response.actors;
 				for(actor in actorList) {
 					movies.get(movieID).actorIDs.push(actor.id);
 				}
@@ -43,7 +43,7 @@ class Movies {
 
 	public static function queryAll() {
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("GET", "http://localhost:8000/movies", true);
+		xhr.open("GET", "http://localhost:8000/api/v1/movie", true);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;
 		xhr.onload = function() {
 			if(xhr.status >= 200 && xhr.status < 300) {

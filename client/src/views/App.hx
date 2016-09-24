@@ -57,6 +57,7 @@ class App extends ReactComponentOfState<AppState> {
 					React.createElement(MovieList, null)
 				),
 				React.createElement("footer", null,
+					React.createElement("p", null, "This product uses the TMDb API but is not endorsed or certified by TMDb."),
 					React.createElement(AuthGreeting, null),
 					React.createElement("p", null,
 						React.createElement(AuthButton, null)
