@@ -13,6 +13,7 @@ using StringTools;
 typedef AddActorState = {
     var searchResults:Array<TActor>;
     var searching:Bool;
+    var adding:Bool;
 }
 
 typedef AddActorProps = {
@@ -28,25 +29,32 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
         super(props);
         state = {
             searchResults: new Array<TActor>(),
-            searching: false
+            searching: false,
+            adding: false
         };
     }
 
     override public function render() {
-        return
-            React.createElement("div", {},
-                React.createElement("label", { className: "search" },
-                    React.createElement("i", {className: "fa fa-search"}),
-                    React.createElement("input", {
-                        type: "text",
-                        placeholder: "Actor name",
-                        list: "actorNameDataList",
-                        ref: "searchText",
-                        onKeyDown: function(event:js.html.KeyboardEvent) { if(event.key == "Enter") performSearch(); }
-                    })
-                ),
-                renderSearchResults()
-            );
+        if(state.adding)
+            return
+                React.createElement("div", {},
+                    React.createElement(Loader)
+                );
+        else
+            return
+                React.createElement("div", {},
+                    React.createElement("label", { className: "search" },
+                        React.createElement("i", {className: "fa fa-search"}),
+                        React.createElement("input", {
+                            type: "text",
+                            placeholder: "Actor name",
+                            list: "actorNameDataList",
+                            ref: "searchText",
+                            onKeyDown: function(event:js.html.KeyboardEvent) { if(event.key == "Enter") performSearch(); }
+                        })
+                    ),
+                    renderSearchResults()
+                );
     }
 
     private function performSearch() {
@@ -55,7 +63,8 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
 
         setState({
             searchResults: null,
-            searching: true
+            searching: true,
+            adding: false
         });
 
         // search!
@@ -63,7 +72,8 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
             .then(function(actors:Array<TActor>) {
                 setState({
                     searchResults: actors,
-                    searching: false
+                    searching: false,
+                    adding: false
                 });
             })
             .catchError(function(error:Dynamic) {
@@ -103,19 +113,28 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
     }
 
     private function addActor(actor:TActor) {
+        //clear our search results
+        refs.searchText.value = "";
+        setState({
+            searchResults: null,
+            searching: false,
+            adding: true
+        });
+
+        // TODO: actually do the action!
         if(!Actors.actors.exists(actor.id)) {
             // we have a new actor, add them to the database
             js.Browser.alert("new actor: " + actor.name);
         }
         else {
+            // just an old actor
             js.Browser.alert("old actor: " + actor.name);
         }
 
-        // and clear our search results
-        refs.searchText.value = "";
-        setState({
+        /*setState({
             searchResults: null,
-            searching: false
-        });
+            searching: false,
+            adding: false
+        });*/
     }
 }
