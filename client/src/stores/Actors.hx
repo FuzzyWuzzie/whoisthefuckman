@@ -40,4 +40,23 @@ class Actors {
 		xhr.ontimeout = function() Main.console.error('get actor list request timed out!');
 		xhr.send();
 	}
+
+	public static function findActors(name:String):Promise<Array<TActor>> {
+		var d:Deferred<Array<TActor>> = new Deferred<Array<TActor>>();
+		var p:Promise<Array<TActor>> = d.promise();
+
+		var ret:Array<TActor> = new Array<TActor>();
+
+		var regex:EReg = new EReg(".*" + name + ".*", "gi");
+		for(actor in actors) {
+			if(regex.match(actor.name))
+				ret.push(actor);
+		}
+
+		// now query TMDB
+		// TODO
+		d.resolve(ret);
+
+		return p;
+	}
 }

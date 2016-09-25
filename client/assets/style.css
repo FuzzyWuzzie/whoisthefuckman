@@ -112,6 +112,33 @@ article > ul > li.expanded:before {
   content: "\f150"; /* FontAwesome Unicode */
 }
 
+li ul {
+  list-style-type: disc;
+  padding-left: 1em;
+}
+
+.fa-trash {
+  margin-left: 0.5em;
+}
+
+.fa-plus-circle {
+  margin-right: 0.5em;
+}
+
+.search {
+  position: relative;
+}
+
+.search i {
+  position: absolute;
+  top: 0.1em;
+  right: 0.1em;
+}
+
+.search input {
+  padding-right: 1.5em;
+}
+
 /* link colours! */
 a {
   color: #333;
@@ -121,6 +148,22 @@ a {
 a:hover, a:focus, a:active {
   color: #bf0a30;
   text-decoration: none;
+}
+
+/* loader! */
+.loader {
+  border: 0.25em solid #f3f3f3;
+  border-top: 0.25em solid #bf0a30;
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  animation: spin 0.5s linear infinite;
+  margin: 0.5em auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* let print do its own thing */

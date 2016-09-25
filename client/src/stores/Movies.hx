@@ -73,4 +73,11 @@ class Movies {
 		xhr.ontimeout = function() Main.console.error('get movie list request timed out!');
 		xhr.send();
 	}
+
+	// TODO: promisify
+	public static function addActor(movie:TMovie, actor:TActor) {
+		// TODO: sync with server
+		movies.get(movie.id).actorIDs.push(actor.id);
+		changed.trigger();
+	}
 }

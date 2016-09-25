@@ -50,19 +50,21 @@ class App extends ReactComponentOfState<AppState> {
 		return
 			React.createElement("div", null,
 				React.createElement("header", null,
-					React.createElement("h1", null, Translation.get("home/title")),
+					React.createElement("h1", null,
+						React.createElement("a", {href:"/"}, Translation.get("home/title"))
+					),
 					React.createElement("p", null, Translation.get("home/tagline"))
 				),
-				React.createElement("article", null,
-					React.createElement(MovieList, null)
-				),
+				state.authenticated ? React.createElement("p", null, "Make your changes below. When you're done, click the 'Regenerate' button to publish your changes.") : null,
+				state.authenticated ? React.createElement("article", null, React.createElement(MovieList, null)) : null,
 				React.createElement("footer", null,
 					React.createElement("p", null, "This product uses the TMDb API but is not endorsed or certified by TMDb."),
 					React.createElement(AuthGreeting, null),
 					React.createElement("p", null,
 						React.createElement(AuthButton, null)
 					)
-				)
+				),
+				React.createElement(ActorNameDataList, {})
 			);
 	}
 }

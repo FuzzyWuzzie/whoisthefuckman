@@ -18,8 +18,8 @@ class MovieList extends ReactComponentOfState<MovieListState> {
 	public function new(props:Dynamic) {
 		super(props);
 		state = {
-			movies: Movies.movies,
-			actors: Actors.actors
+			movies: null,
+			actors: null
 		};
 	}
 
@@ -33,6 +33,10 @@ class MovieList extends ReactComponentOfState<MovieListState> {
 	override public function componentDidMount() {
 		Movies.changed.listen(update);
 		Actors.changed.listen(update);
+		setState({
+			movies: null,
+			actors: null
+		});
 		Movies.queryAll();
 		Actors.queryAll();
 	}
@@ -43,7 +47,10 @@ class MovieList extends ReactComponentOfState<MovieListState> {
 	}
 
 	override public function render() {
-		return React.createElement("ul", null, renderMovieList());
+		if(state.movies == null)
+			return React.createElement(Loader, {});
+		else
+			return React.createElement("ul", null, renderMovieList());
 	}
 
 	private function renderMovieList():Array<ReactComponent> {
