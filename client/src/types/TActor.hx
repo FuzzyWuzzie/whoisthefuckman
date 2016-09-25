@@ -3,6 +3,6 @@ package types;
 typedef TActor = {
 	var id:Int;
 	var name:String;
-    var biography:String;
-    var image_path:String;
+    @:optional var biography:String;
+    @:optional var image_path:String;
 };

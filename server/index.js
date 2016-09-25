@@ -70,6 +70,7 @@ context = {
 var movies = require('./movies');
 var actors = require('./actors');
 var generator = require('./generator');
+var configuration = require('./configuration');
 
 // setup our models
 movies.model = movies.defineModel(db, log);
@@ -99,11 +100,13 @@ app.use('/api/v1', apiRouter);
 movies.router = movies.setupRouter(apiRouter);
 actors.router = actors.setupRouter(apiRouter);
 generator.router = generator.setupRouter(apiRouter);
+configuration.router = configuration.setupRouter(apiRouter);
 
 // and start our controllers
 movies.engageControllers(context, movies.router);
 actors.engageControllers(context, actors.router);
 generator.engageControllers(context, generator.router);
+configuration.engageControllers(context, configuration.router);
 
 // deal with unhandled routes gracefully
 app.use(function(req, res, next) {

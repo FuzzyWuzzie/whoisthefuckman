@@ -47,6 +47,20 @@ class Authenticate {
 			return;
 		}
 
+		// make sure we haven't expired
+		var payloadEncoded:String = idToken.split(".")[1];
+		var payload:Dynamic = haxe.Json.parse(haxe.crypto.Base64.decode(payloadEncoded).toString());
+		var ts:Float = Date.now().getTime() / 1000;
+		if(ts >= payload.exp) {
+			Main.console.warn("Authentication failed: token expired", {
+				expiry: payload.exp,
+				now: ts
+			});
+			token = null;
+			authenticated = false;
+			return;
+		}
+
 		lock.getProfile(idToken, function(error, userProfile) {
 			if(error != null) {
 				token = null;
@@ -58,6 +72,7 @@ class Authenticate {
 			token = idToken;
 			profile = userProfile;
 			authenticated = true;
+			tmdb.TMDB.init();
 		});
 	}
 

@@ -103,7 +103,13 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
     }
 
     private function addActor(actor:TActor) {
-        Movies.addActor(props.movie, actor);
+        if(!Actors.actors.exists(actor.id)) {
+            // we have a new actor, add them to the database
+            js.Browser.alert("new actor: " + actor.name);
+        }
+        else {
+            js.Browser.alert("old actor: " + actor.name);
+        }
 
         // and clear our search results
         refs.searchText.value = "";

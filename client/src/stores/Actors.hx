@@ -7,7 +7,9 @@ import promhx.haxe.Http;
 import jsoni18n.I18n;
 import promhx.Deferred;
 import promhx.Promise;
+import tmdb.PersonSearchResult;
 import types.TActor;
+import tmdb.TMDB;
 
 class Actors {
 	private function new() {}
@@ -47,6 +49,7 @@ class Actors {
 
 		var ret:Array<TActor> = new Array<TActor>();
 
+		// search internally
 		var regex:EReg = new EReg(".*" + name + ".*", "gi");
 		for(actor in actors) {
 			if(regex.match(actor.name))
@@ -54,8 +57,44 @@ class Actors {
 		}
 
 		// now query TMDB
-		// TODO
-		d.resolve(ret);
+		TMDB.searchPeople(name)
+			.then(function(results:Array<PersonSearchResult>) {
+				for(result in results) {
+					// make sure we don't have already have them in the results
+					var skip:Bool = false;
+					for(existing in ret) {
+						if(existing.id == result.id) {
+							skip = true;
+							break;
+						}
+					}
+					if(skip) continue;
+
+					var actor:TActor = {
+						id: result.id,
+						name: result.name
+					};
+					if(result.known_for != null) {
+						var knownList:Array<String> = new Array<String>();
+						for(known_for in result.known_for) {
+							if(known_for.title != null)
+								knownList.push(known_for.title);
+							else if(known_for.name != null)
+								knownList.push(known_for.name);
+						}
+						if(knownList.length > 0)
+							actor.biography = "Known for: " + knownList.join(", ");
+					}
+
+					ret.push(actor);
+				}
+
+				// finally resolve!
+				d.resolve(ret);
+			})
+			.catchError(function(error) {
+				d.throwError(error);
+			});
 
 		return p;
 	}
