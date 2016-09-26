@@ -28,7 +28,7 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
     public function new(props:AddActorProps) {
         super(props);
         state = {
-            searchResults: new Array<TActor>(),
+            searchResults: null,
             searching: false,
             adding: false
         };
@@ -84,7 +84,7 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
     }
 
     private function renderSearchResults():ReactComponent {
-        if(state.searchResults == null || state.searchResults.length == 0)
+        if(state.searchResults == null)
             return null;
 
         var actorItems:Array<ReactComponent> = new Array<ReactComponent>();
@@ -100,15 +100,16 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
             actorItems.push(React.createElement("dd", {}, actor.biography));
         }
 
-        var loaderOrElements:ReactComponent =
-            state.searching
-                ? React.createElement(Loader)
-                : React.createElement("dl", {}, actorItems);
+        var results:ReactComponent =
+            if(state.searching) React.createElement(Loader);
+            else if(state.searchResults.length > 0)
+                React.createElement("dl", {}, actorItems);
+            else React.createElement("p", {}, 'No actors by the name of "${refs.searchText.value}" were found!');
 
         return
             React.createElement("dl", {},
                 React.createElement("dt", {}, "Results:"),
-                React.createElement("dd", {}, loaderOrElements)
+                React.createElement("dd", {}, results)
             );
     }
 
