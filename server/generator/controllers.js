@@ -121,7 +121,12 @@ module.exports = function(context, router) {
             })
             .then(function(contents) {
                 homeTemplate = contents;
-                return context.models.movie.findAll();
+                return context.models.movie.findAll({
+                    order: [
+                        ['title', 'ASC'],
+                        ['release_date', 'ASC']
+                    ]
+                });
             })
             .then(function(movies) {
                 var moviePromises = movies.map(buildMovie);
@@ -151,7 +156,11 @@ module.exports = function(context, router) {
             })
             .then(function(contents) {
                 actorTemplate = contents;
-                return context.models.actor.findAll();
+                return context.models.actor.findAll({
+                    order: [
+                        ['name', 'ASC']
+                    ]
+                });
             })
             .then(function(actors) {
                 var actorPromises = actors.map(buildActor);
