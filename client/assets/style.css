@@ -88,27 +88,27 @@ article > dl > dd {
   margin-bottom: 0.25em;
 }
 
-article > ul {
+article > div > ul {
   list-style: none;
   padding: 0;
 }
 
-article > ul > li {
+article > div > ul > li {
   padding-left: 1.3em;
 }
 
-article > ul > li:before {
+article > div > ul > li:before {
   font-family: FontAwesome;
   display: inline-block;
   margin-left: -1.3em; /* same as padding-left set on li */
   width: 1.3em; /* same as padding-left set on li */
 }
 
-article > ul > li.unexpanded:before {
+article > div > ul > li.unexpanded:before {
   content: "\f152"; /* FontAwesome Unicode */
 }
 
-article > ul > li.expanded:before {
+article > div > ul > li.expanded:before {
   content: "\f150"; /* FontAwesome Unicode */
 }
 
