@@ -13,6 +13,7 @@ typedef MovieState = {
 	var expanded:Bool;
 	var movies:IntMap<TMovie>;
 	var actors:IntMap<TActor>;
+	var removingActor:Bool;
 }
 
 typedef MovieProps = {
@@ -25,7 +26,8 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 		state = {
 			expanded: false,
 			movies: Movies.movies,
-			actors: Actors.actors
+			actors: Actors.actors,
+			removingActor: false
 		};
 	}
 
@@ -33,7 +35,8 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 		setState({
 			expanded: state.expanded,
 			movies: Movies.movies,
-			actors: Actors.actors
+			actors: Actors.actors,
+			removingActor: state.removingActor
 		});
 	}
 
@@ -59,9 +62,9 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 				React.createElement("dl", {},
 					React.createElement("dt", {}, "Overview"),
 					React.createElement("dd", {}, props.movie.overview),
-					React.createElement("dt", {}, "Actors"),
+					React.createElement("dt", {}, "Fuck Men"),
 					React.createElement("dd", {},
-						React.createElement("ul", {}, renderActors()),
+						renderActors(),
 						React.createElement(AddActor, { movie:props.movie })
 					)
 				)
@@ -84,11 +87,15 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 		setState({
 			expanded: !state.expanded,
 			movies: Movies.movies,
-			actors: Actors.actors
+			actors: Actors.actors,
+			removingActor: state.removingActor
 		});
 	}
 
-	private function renderActors():Array<ReactComponent> {
+	private function renderActors():ReactComponent {
+		if(state.removingActor)
+			return React.createElement(Loader);
+
 		var a:Array<ReactComponent> = new Array<ReactComponent>();
 
 		for(actorID in props.movie.actorIDs) {
@@ -96,21 +103,46 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 			var actor:TActor = Actors.actors.get(actorID);
 			a.push(
 				React.createElement("li", {}, actor.name,
-					React.createElement("a", { href: "#", onClick: function() { removeActor(actor.id); } },
+					React.createElement("a", { href: "#", onClick: function() { removeActor(actor); } },
 						React.createElement("i", { className: "fa fa-trash" })
 					)
 				)
 			);
 		}
 
-		return a;
+		return React.createElement("ul", {}, a);
 	}
 
 	private function removeMovie() {
 		js.Browser.alert("remove movie " + props.movie.id);
 	}
 
-	private function removeActor(actorID:Int) {
-		js.Browser.alert("remove actor " + actorID + " from movie " + props.movie.id);
+	private function removeActor(actor:TActor) {
+		setState({
+			expanded: state.expanded,
+			movies: Movies.movies,
+			actors: Actors.actors,
+			removingActor: true
+		});
+
+		Movies.deleteActor(props.movie, actor)
+			.then(function(movie:TMovie) {
+				Main.console.log('Removed actor ${actor.name} from movie ${props.movie.title}');
+				setState({
+					expanded: state.expanded,
+					movies: Movies.movies,
+					actors: Actors.actors,
+					removingActor: false
+				});
+			})
+			.catchError(function(error:Dynamic) {
+				Main.console.error(error);
+				setState({
+					expanded: state.expanded,
+					movies: Movies.movies,
+					actors: Actors.actors,
+					removingActor: false
+				});
+			});
 	}
 }

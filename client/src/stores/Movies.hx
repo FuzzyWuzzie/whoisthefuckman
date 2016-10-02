@@ -74,10 +74,104 @@ class Movies {
 		xhr.send();
 	}
 
-	// TODO: promisify
-	public static function addActor(movie:TMovie, actor:TActor) {
-		// TODO: sync with server
-		movies.get(movie.id).actorIDs.push(actor.id);
-		changed.trigger();
+	private static function addActorServer(movie:TMovie, actor:TActor):Promise<TMovie> {
+		var d:Deferred<TMovie> = new Deferred<TMovie>();
+		var xhr:XMLHttpRequest = new XMLHttpRequest();
+		xhr.open("POST", 'http://localhost:8000/api/v1/movie/${movie.id}/actor', true);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
+		xhr.responseType = XMLHttpRequestResponseType.JSON;
+		xhr.onload = function() {
+			if(xhr.status >= 200 && xhr.status < 300) {
+				// parse it
+				var mov:TMovie = cast xhr.response.movie;
+				var actors:Array<TActor> = cast xhr.response.actors;
+
+				// specify our linkage
+				mov.actorIDs = new Array<Int>();
+				for(act in actors) {
+					mov.actorIDs.push(act.id);
+				}
+
+				// store it
+				movies.set(mov.id, mov);
+
+				// notify
+				changed.trigger();
+				d.resolve(mov);
+			}
+			else {
+				d.throwError(xhr.response);
+			}
+		};
+		xhr.onabort = function() { var err:String = 'aborted add actor request'; Main.console.warn(err); d.throwError(err); }
+		xhr.onerror = function() { var err:String = 'failed to get add actor'; Main.console.error(err); d.throwError(err); }
+		xhr.ontimeout = function() { var err:String = 'get add actor request timed out!'; Main.console.error(err); d.throwError(err); }
+		xhr.send('id=${actor.id}');
+		return d.promise();
+	}
+
+	private static function deleteActorServer(movie:TMovie, actor:TActor):Promise<TMovie> {
+		var d:Deferred<TMovie> = new Deferred<TMovie>();
+		var xhr:XMLHttpRequest = new XMLHttpRequest();
+		xhr.open("DELETE", 'http://localhost:8000/api/v1/movie/${movie.id}/actor/${actor.id}', true);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
+		xhr.responseType = XMLHttpRequestResponseType.JSON;
+		xhr.onload = function() {
+			if(xhr.status >= 200 && xhr.status < 300) {
+				// parse it
+				var mov:TMovie = cast xhr.response.movie;
+				var actors:Array<TActor> = cast xhr.response.actors;
+
+				// specify our linkage
+				mov.actorIDs = new Array<Int>();
+				for(act in actors) {
+					mov.actorIDs.push(act.id);
+				}
+
+				// store it
+				movies.set(mov.id, mov);
+
+				// notify
+				changed.trigger();
+				d.resolve(mov);
+			}
+			else {
+				d.throwError(xhr.response);
+			}
+		};
+		xhr.onabort = function() { var err:String = 'aborted delete actor request'; Main.console.warn(err); d.throwError(err); }
+		xhr.onerror = function() { var err:String = 'failed to get delete actor'; Main.console.error(err); d.throwError(err); }
+		xhr.ontimeout = function() { var err:String = 'get delete actor request timed out!'; Main.console.error(err); d.throwError(err); }
+		xhr.send();
+		return d.promise();
+	}
+
+	public static function addActor(movie:TMovie, actor:TActor):Promise<TMovie> {
+		var d:Deferred<TMovie> = new Deferred<TMovie>();
+		var isNew:Bool = !Actors.actors.exists(actor.id);
+
+		if(isNew) {
+			d.throwError("Can't handle new actors yet!");
+		}
+		else {
+			return addActorServer(movie, actor);
+		}
+
+		return d.promise();
+	}
+
+	public static function deleteActor(movie:TMovie, actor:TActor):Promise<TMovie> {
+		var d:Deferred<TMovie> = new Deferred<TMovie>();
+
+		if(!Actors.actors.exists(actor.id)) {
+			d.throwError("That actor doesn't even exist!");
+		}
+		else {
+			return deleteActorServer(movie, actor);
+		}
+
+		return d.promise();
 	}
 }

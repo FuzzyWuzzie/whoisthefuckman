@@ -100,55 +100,53 @@ module.exports = function(context, router) {
     };
     router.post('/', context.auth, controllers.upsert);
 
-    controllers.addActors = function(req, res, next) {
-        if(!req.body.ids) {
+    controllers.addActor = function(req, res, next) {
+        if(!req.body.id) {
             res.status(400).json({
-                message: "you need an `ids` parameter!"
+                message: "you need an `id` parameter!"
             });
             return;
         }
 
-        context.db.transaction(function(t) {
+        /*context.db.transaction(function(t) {
             var result = {};
             return context.models.movie.findById(req.params.movie_id)
                 .then(function(movie) {
                     result.movie = movie;
-                    return context.models.actor.findAll({
-                        where: {
-                            id: {
-                                $in: typeof(req.body.ids) === 'string' ? JSON.parse(req.body.ids) : req.body.ids
-                            }
-                        }
-                    });
+                    return context.models.actor.findById(parseInt(req.body.id))
                 })
-                .then(function(actors) {
-                    result.actors = actors;
-                    return result.movie.addActors(actors, {transaction: t});
+                .then(function(actor) {
+                    return result.movie.addActor(actor, {transaction: t});
                 })
                 .then(function() {
                     return result;
+                })
+        })*/
+        var result = {};
+        context.models.movie.findById(req.params.movie_id)
+            .then(function(movie) {
+                result.movie = movie;
+                return context.models.actor.findById(parseInt(req.body.id));
+            })
+            .then(function(actor) {
+                return result.movie.addActor(actor);
+            })
+            .then(function() {
+                return result.movie.getActors();
+            })
+            .then(function(actors) {
+                res.json({
+                    movie: context.sanitize.movie(result.movie),
+                    actors: actors.map(context.sanitize.actor)
                 });
-        })
-        .then(function(result) {
-            res.json({
-                movie: context.sanitize.movie(result.movie),
-                actors: result.actors.map(context.sanitize.actor)
+            })
+            .catch(function(error) {
+                next(error);
             });
-        })
-        .catch(function(error) {
-            next(error);
-        })
     };
-    router.post('/:movie_id/actor', context.auth, controllers.addActors);
+    router.post('/:movie_id/actor', context.auth, controllers.addActor);
 
-    controllers.deleteActors = function(req, res, next) {
-        if(!req.body.ids) {
-            res.status(400).json({
-                message: "you need an `ids` parameter!"
-            });
-            return;
-        }
-
+    controllers.deleteActor = function(req, res, next) {
         var MovieNotFound = {};
         var result = {};
         context.models.movie.findById(req.params.movie_id)
@@ -156,7 +154,7 @@ module.exports = function(context, router) {
                 if(movie == null)
                     throw MovieNotFound;
                 result.movie = movie;
-                return movie.removeActors(typeof(req.body.ids) === 'string' ? JSON.parse(req.body.ids) : req.body.ids);
+                return movie.removeActor(parseInt(req.params.actor_id));
             })
             .then(function() {
                 return result.movie.getActors();
@@ -177,7 +175,7 @@ module.exports = function(context, router) {
                     next(error);
             });
     }
-    router.delete('/:movie_id/actor', context.auth, controllers.deleteActors);
+    router.delete('/:movie_id/actor/:actor_id', context.auth, controllers.deleteActor);
 
     return controllers;
 }

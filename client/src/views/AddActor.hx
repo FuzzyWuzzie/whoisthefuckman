@@ -122,20 +122,23 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
             adding: true
         });
 
-        // TODO: actually do the action!
-        if(!Actors.actors.exists(actor.id)) {
-            // we have a new actor, add them to the database
-            js.Browser.alert("new actor: " + actor.name);
-        }
-        else {
-            // just an old actor
-            js.Browser.alert("old actor: " + actor.name);
-        }
-
-        /*setState({
-            searchResults: null,
-            searching: false,
-            adding: false
-        });*/
+        // add the actor!
+        Movies.addActor(props.movie, actor)
+            .then(function(movie:TMovie) {
+                Main.console.log('Added actor ${actor.name} to movie ${movie.title}');
+                setState({
+                    searchResults: null,
+                    searching: false,
+                    adding: false
+                });
+            })
+            .catchError(function(error:Dynamic) {
+                Main.console.error(error);
+                setState({
+                    searchResults: null,
+                    searching: false,
+                    adding: false
+                });
+            });
     }
 }
