@@ -16,6 +16,44 @@ class Actors {
 	public static var changed(default, null):Event = new Event();
 	public static var actors(default, null):IntMap<TActor> = new IntMap<TActor>();
 
+    public static function add(actor:TActor):Promise<TActor> {
+        var d:Deferred<TActor> = new Deferred<TActor>();
+        var isNew:Bool = !actors.exists(actor.id);
+
+        if(!isNew) {
+            d.throwError('Actor ${actor.name} already exists!');
+            return d.promise();
+        }
+
+        var xhr:XMLHttpRequest = new XMLHttpRequest();
+        xhr.open("POST", 'http://localhost:8000/api/v1/actor', true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
+        xhr.responseType = XMLHttpRequestResponseType.JSON;
+        xhr.onload = function() {
+            if(xhr.status >= 200 && xhr.status < 300) {
+                // parse it
+                var act:TActor = cast xhr.response;
+
+                // store it
+                actors.set(act.id, act);
+
+                // notify
+                changed.trigger();
+                d.resolve(act);
+            }
+            else {
+                d.throwError(xhr.response);
+            }
+        };
+        xhr.onabort = function() { d.throwError('aborted add actor request'); }
+        xhr.onerror = function() { d.throwError('failed to get add actor'); }
+        xhr.ontimeout = function() { d.throwError('get add actor request timed out!'); }
+        xhr.send('id=${actor.id}');
+
+        return d.promise();
+    }
+
 	public static function queryAll() {
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
 		xhr.open("GET", "http://localhost:8000/api/v1/actor", true);

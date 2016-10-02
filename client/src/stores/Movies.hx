@@ -248,7 +248,16 @@ class Movies {
 		var isNew:Bool = !Actors.actors.exists(actor.id);
 
 		if(isNew) {
-			d.throwError("Can't handle new actors yet!");
+			Actors.add(actor)
+				.pipe(function(act:TActor):Promise<TMovie> {
+					return addActorServer(movie, act);
+				})
+				.then(function(mov:TMovie) {
+					d.resolve(mov);
+				})
+				.catchError(function(error:Dynamic) {
+					d.throwError(error);
+				});
 		}
 		else {
 			return addActorServer(movie, actor);
