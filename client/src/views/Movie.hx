@@ -13,6 +13,7 @@ typedef MovieState = {
 	var expanded:Bool;
 	var movies:IntMap<TMovie>;
 	var actors:IntMap<TActor>;
+	var removingMovie:Bool;
 	var removingActor:Bool;
 }
 
@@ -27,6 +28,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 			expanded: false,
 			movies: Movies.movies,
 			actors: Actors.actors,
+			removingMovie: false,
 			removingActor: false
 		};
 	}
@@ -36,6 +38,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 			expanded: state.expanded,
 			movies: Movies.movies,
 			actors: Actors.actors,
+			removingMovie: state.removingMovie,
 			removingActor: state.removingActor
 		});
 	}
@@ -57,7 +60,10 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 
 		var components:Array<ReactComponent> = new Array<ReactComponent>();
 
-		if(state.expanded) {
+		if(state.removingMovie) {
+			components.push(React.createElement(Loader));
+		}
+		else if(state.expanded) {
 			components.push(
 				React.createElement("dl", {},
 					React.createElement("dt", {}, "Overview"),
@@ -88,6 +94,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 			expanded: !state.expanded,
 			movies: Movies.movies,
 			actors: Actors.actors,
+			removingMovie: state.removingMovie,
 			removingActor: state.removingActor
 		});
 	}
@@ -114,7 +121,35 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 	}
 
 	private function removeMovie() {
-		js.Browser.alert("remove movie " + props.movie.id);
+		setState({
+			expanded: state.expanded,
+			movies: Movies.movies,
+			actors: Actors.actors,
+			removingMovie: true,
+			removingActor: state.removingActor
+		});
+
+		Movies.delete(props.movie)
+			.then(function(movie:TMovie) {
+				Main.console.log('Removed movie ${props.movie.title}');
+				setState({
+					expanded: state.expanded,
+					movies: Movies.movies,
+					actors: Actors.actors,
+					removingMovie: false,
+					removingActor: state.removingActor
+				});
+			})
+			.catchError(function(error:Dynamic) {
+				Main.console.error(error);
+				setState({
+					expanded: state.expanded,
+					movies: Movies.movies,
+					actors: Actors.actors,
+					removingMovie: false,
+					removingActor: state.removingActor
+				});
+			});
 	}
 
 	private function removeActor(actor:TActor) {
@@ -122,6 +157,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 			expanded: state.expanded,
 			movies: Movies.movies,
 			actors: Actors.actors,
+			removingMovie: state.removingMovie,
 			removingActor: true
 		});
 
@@ -132,6 +168,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 					expanded: state.expanded,
 					movies: Movies.movies,
 					actors: Actors.actors,
+					removingMovie: state.removingMovie,
 					removingActor: false
 				});
 			})
@@ -141,6 +178,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 					expanded: state.expanded,
 					movies: Movies.movies,
 					actors: Actors.actors,
+					removingMovie: state.removingMovie,
 					removingActor: false
 				});
 			});

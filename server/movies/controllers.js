@@ -108,20 +108,6 @@ module.exports = function(context, router) {
             return;
         }
 
-        /*context.db.transaction(function(t) {
-            var result = {};
-            return context.models.movie.findById(req.params.movie_id)
-                .then(function(movie) {
-                    result.movie = movie;
-                    return context.models.actor.findById(parseInt(req.body.id))
-                })
-                .then(function(actor) {
-                    return result.movie.addActor(actor, {transaction: t});
-                })
-                .then(function() {
-                    return result;
-                })
-        })*/
         var result = {};
         context.models.movie.findById(req.params.movie_id)
             .then(function(movie) {
@@ -176,6 +162,31 @@ module.exports = function(context, router) {
             });
     }
     router.delete('/:movie_id/actor/:actor_id', context.auth, controllers.deleteActor);
+
+    controllers.deleteMovie = function(req, res, next) {
+        var MovieNotFound = {};
+        var result = {};
+        context.models.movie.findById(req.params.movie_id)
+            .then(function(movie) {
+                if(movie == null)
+                    throw MovieNotFound;
+                result.movie = movie;
+                return movie.destroy();
+            })
+            .then(function() {
+                res.json(result.movie);
+            })
+            .catch(function(error) {
+                if(error === MovieNotFound) {
+                    res.status(404).json({
+                        message: "movie not found"
+                    });
+                }
+                else
+                    next(error);
+            });
+    }
+    router.delete('/:movie_id', context.auth, controllers.deleteMovie);
 
     return controllers;
 }

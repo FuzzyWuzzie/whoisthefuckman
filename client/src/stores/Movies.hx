@@ -15,6 +15,37 @@ class Movies {
 	public static var changed(default, null):Event = new Event();
 	public static var movies(default, null):IntMap<TMovie> = new IntMap<TMovie>();
 
+	public static function delete(movie:TMovie):Promise<TMovie> {
+		var d:Deferred<TMovie> = new Deferred<TMovie>();
+		if(!movies.exists(movie.id)) {
+			d.throwError('Can\'t delete movie ${movie.title} as it isn\'t in the local db!');
+		}
+
+		var xhr:XMLHttpRequest = new XMLHttpRequest();
+		xhr.open("DELETE", 'http://localhost:8000/api/v1/movie/${movie.id}', true);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
+		xhr.responseType = XMLHttpRequestResponseType.JSON;
+		xhr.onload = function() {
+			if(xhr.status >= 200 && xhr.status < 300) {
+				// remove it
+				movies.remove(movie.id);
+
+				// notify
+				changed.trigger();
+				d.resolve(movie);
+			}
+			else {
+				d.throwError(xhr.response);
+			}
+		};
+		xhr.onabort = function() { d.throwError('aborted delete movie request'); }
+		xhr.onerror = function() { d.throwError('failed to get delete movie'); }
+		xhr.ontimeout = function() { d.throwError('get delete movie request timed out!'); }
+		xhr.send();
+		return d.promise();
+	}
+
 	private static function queryActorIDs(movieID:Int) {
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
 		xhr.open("GET", 'http://localhost:8000/api/v1/movie/${movieID}', true);
@@ -104,9 +135,9 @@ class Movies {
 				d.throwError(xhr.response);
 			}
 		};
-		xhr.onabort = function() { var err:String = 'aborted add actor request'; Main.console.warn(err); d.throwError(err); }
-		xhr.onerror = function() { var err:String = 'failed to get add actor'; Main.console.error(err); d.throwError(err); }
-		xhr.ontimeout = function() { var err:String = 'get add actor request timed out!'; Main.console.error(err); d.throwError(err); }
+		xhr.onabort = function() { d.throwError('aborted add actor request'); }
+		xhr.onerror = function() { d.throwError('failed to get add actor'); }
+		xhr.ontimeout = function() { d.throwError('get add actor request timed out!'); }
 		xhr.send('id=${actor.id}');
 		return d.promise();
 	}
@@ -141,9 +172,9 @@ class Movies {
 				d.throwError(xhr.response);
 			}
 		};
-		xhr.onabort = function() { var err:String = 'aborted delete actor request'; Main.console.warn(err); d.throwError(err); }
-		xhr.onerror = function() { var err:String = 'failed to get delete actor'; Main.console.error(err); d.throwError(err); }
-		xhr.ontimeout = function() { var err:String = 'get delete actor request timed out!'; Main.console.error(err); d.throwError(err); }
+		xhr.onabort = function() { d.throwError('aborted delete actor request'); }
+		xhr.onerror = function() { d.throwError('failed to get delete actor'); }
+		xhr.ontimeout = function() { d.throwError('get delete actor request timed out!'); }
 		xhr.send();
 		return d.promise();
 	}
