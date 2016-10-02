@@ -101,6 +101,10 @@ article figure img {
   max-width: 100%;
 }
 
+.thefuckman {
+  clear: both;
+}
+
 /* link colours! */
 a {
   color: #333;
