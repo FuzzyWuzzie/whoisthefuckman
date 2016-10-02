@@ -59,9 +59,18 @@ class MovieList extends ReactComponentOfState<MovieListState> {
 	private function renderMovieList():Array<ReactComponent> {
 		var components:Array<ReactComponent> = new Array<ReactComponent>();
 
-		for(movie in state.movies.iterator()) {
+		var movieArray:Array<TMovie> = new Array<TMovie>();
+		for(movie in state.movies.iterator())
+			movieArray.push(movie);
+		movieArray.sort(function(a:TMovie, b:TMovie):Int {
+			var A:String = a.title.toUpperCase();
+			var B:String = b.title.toUpperCase();
+			if(A < B) return -1;
+			else if(A > B) return 1;
+			return 0;
+		});
+		for(movie in movieArray)
 			components.push(React.createElement(Movie, { movie: movie }));
-		}
 
 		return components;
 	}

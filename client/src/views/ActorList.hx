@@ -11,16 +11,33 @@ typedef ActorListState = {
 }
 
 class ActorList extends ReactComponentOfState<ActorListState> {
+	private function orderActors():Array<TActor> {
+		var actors:Array<TActor> = new Array<TActor>();
+
+		for(actor in Actors.actors.iterator()) {
+			actors.push(actor);
+		}
+		actors.sort(function(a:TActor, b:TActor):Int {
+			var A:String = a.name.toUpperCase();
+			var B:String = b.name.toUpperCase();
+			if(A < B) return -1;
+			else if(A > B) return 1;
+			return 0;
+		});
+
+		return actors;
+	}
+
 	public function new(props:Dynamic) {
 		super(props);
 		state = {
-			actors: Actors.actors
+			actors: orderActors()
 		};
 	}
 
 	private function update() {
 		setState({
-			actors: Actors.actors
+			actors: orderActors()
 		});
 	}
 
