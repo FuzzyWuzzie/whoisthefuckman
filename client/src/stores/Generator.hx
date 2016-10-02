@@ -10,7 +10,7 @@ class Generator {
         var d:Deferred<String> = new Deferred<String>();
 
         var xhr:XMLHttpRequest = new XMLHttpRequest();
-        xhr.open("POST", 'http://localhost:8000/api/v1/generate', true);
+        xhr.open("POST", Main.apiRoot + '/generate', true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
         xhr.responseType = XMLHttpRequestResponseType.JSON;

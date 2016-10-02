@@ -50,7 +50,7 @@ class Movies {
         }
 
         var xhr:XMLHttpRequest = new XMLHttpRequest();
-        xhr.open("POST", 'http://localhost:8000/api/v1/movie', true);
+        xhr.open("POST", Main.apiRoot + '/movie', true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
         xhr.responseType = XMLHttpRequestResponseType.JSON;
@@ -86,7 +86,7 @@ class Movies {
 		}
 
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("DELETE", 'http://localhost:8000/api/v1/movie/${movie.id}', true);
+		xhr.open("DELETE", Main.apiRoot + '/movie/${movie.id}', true);
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;
@@ -112,7 +112,7 @@ class Movies {
 
 	private static function queryActorIDs(movieID:Int) {
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("GET", 'http://localhost:8000/api/v1/movie/${movieID}', true);
+		xhr.open("GET", Main.apiRoot + '/movie/${movieID}', true);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;
 		xhr.onload = function() {
 			if(xhr.status >= 200 && xhr.status < 300) {
@@ -138,7 +138,7 @@ class Movies {
 
 	public static function queryAll() {
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("GET", "http://localhost:8000/api/v1/movie", true);
+		xhr.open("GET", Main.apiRoot + '//movie', true);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;
 		xhr.onload = function() {
 			if(xhr.status >= 200 && xhr.status < 300) {
@@ -172,7 +172,7 @@ class Movies {
 	private static function addActorServer(movie:TMovie, actor:TActor):Promise<TMovie> {
 		var d:Deferred<TMovie> = new Deferred<TMovie>();
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("POST", 'http://localhost:8000/api/v1/movie/${movie.id}/actor', true);
+		xhr.open("POST", Main.apiRoot + '/movie/${movie.id}/actor', true);
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;
@@ -209,7 +209,7 @@ class Movies {
 	private static function deleteActorServer(movie:TMovie, actor:TActor):Promise<TMovie> {
 		var d:Deferred<TMovie> = new Deferred<TMovie>();
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("DELETE", 'http://localhost:8000/api/v1/movie/${movie.id}/actor/${actor.id}', true);
+		xhr.open("DELETE", Main.apiRoot + '/movie/${movie.id}/actor/${actor.id}', true);
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;

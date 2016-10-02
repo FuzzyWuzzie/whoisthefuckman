@@ -27,7 +27,7 @@ class RegenerateButton extends ReactComponentOfState<RegenerateButtonState> {
             : React.createElement("button", {onClick:regenerate}, "Regenerate");
         var message:ReactComponent = state.message != null
             ? React.createElement("p", {}, state.message + ": ",
-                React.createElement("a", {href: "http://localhost:8000"}, "Results")
+                React.createElement("a", {href: Main.serverRoot}, "Results")
             )
             : null;
 

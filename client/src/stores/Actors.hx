@@ -26,7 +26,7 @@ class Actors {
         }
 
         var xhr:XMLHttpRequest = new XMLHttpRequest();
-        xhr.open("POST", 'http://localhost:8000/api/v1/actor', true);
+        xhr.open("POST", Main.apiRoot + '/actor', true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
         xhr.responseType = XMLHttpRequestResponseType.JSON;
@@ -56,7 +56,7 @@ class Actors {
 
 	public static function queryAll() {
 		var xhr:XMLHttpRequest = new XMLHttpRequest();
-		xhr.open("GET", "http://localhost:8000/api/v1/actor", true);
+		xhr.open("GET", Main.apiRoot + '//actor', true);
 		xhr.responseType = XMLHttpRequestResponseType.JSON;
 		xhr.onload = function() {
 			if(xhr.status >= 200 && xhr.status < 300) {

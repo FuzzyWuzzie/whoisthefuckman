@@ -38,11 +38,8 @@ var db = new sequelize('data', '', '', {
 var app = express();
 var port = config.server.port;
 
-// TODO: remove for deploy!
-// enable CORS (for testing)
-app.use(cors({
-    origin: "http://localhost:8080"
-}));
+// enable CORS
+app.use(cors());
 
 //  parse bodies as JSON data
 app.use(bodyParser.json());
@@ -52,7 +49,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(compression());
 
 // enable a static folder
-app.use(express.static('public'));
+if(config.server.static)
+    app.use(express.static('public'));
 
 // create a global context for our controllers
 context = {

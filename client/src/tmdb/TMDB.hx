@@ -14,7 +14,7 @@ class TMDB {
 
     public static function init() {
         var xhr:XMLHttpRequest = new XMLHttpRequest();
-        xhr.open("GET", "http://localhost:8000/api/v1/config/tmdb", true);
+        xhr.open("GET", Main.apiRoot + '//config/tmdb', true);
         xhr.setRequestHeader("Authorization", "Bearer " + stores.Authenticate.token);
         xhr.responseType = XMLHttpRequestResponseType.JSON;
         xhr.onload = function() {
