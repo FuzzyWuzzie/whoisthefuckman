@@ -40,7 +40,7 @@ class AuthGreeting extends ReactComponentOfState<AuthGreetingState> {
 	override public function render() {
 		if(Authenticate.authenticated)
 			return React.createElement("p", null,
-				React.createElement("span", null, 'Welcome, ${Authenticate.profile.name}!')
+				React.createElement("span", null, 'Howdy, ${Authenticate.getName()}!')
 			);
 		else
 			return null;

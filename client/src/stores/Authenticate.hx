@@ -34,6 +34,12 @@ class Authenticate {
 	public static var token(default, null):String = null;
 	public static var profile(default, null):Dynamic = null;
 
+	public static function getName():String {
+		if(profile.given_name != null)
+			return profile.given_name;
+		return profile.nickname;
+	}
+
 	private static function onAuthenticated(authResult:Dynamic) {
 		js.Browser.getLocalStorage().setItem('idToken', authResult.idToken);
 		check();
