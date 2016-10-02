@@ -7,6 +7,7 @@ import promhx.haxe.Http;
 import jsoni18n.I18n;
 import promhx.Deferred;
 import promhx.Promise;
+import tmdb.MovieSearchResult;
 import types.TActor;
 import types.TMovie;
 
@@ -14,6 +15,69 @@ class Movies {
 	private function new() {}
 	public static var changed(default, null):Event = new Event();
 	public static var movies(default, null):IntMap<TMovie> = new IntMap<TMovie>();
+
+	public static function findMovies(name:String):Promise<Array<MovieSearchResult>> {
+		var d:Deferred<Array<MovieSearchResult>> = new Deferred<Array<MovieSearchResult>>();
+		var ret:Array<MovieSearchResult> = new Array<MovieSearchResult>();
+
+		// query TMDB
+		tmdb.TMDB.searchMovies(name)
+			.then(function(results:Array<MovieSearchResult>) {
+				for(result in results) {
+					// skip if we already have it in our catalog
+					if(movies.exists(result.id))
+						continue;
+					ret.push(result);
+				}
+
+				// finally resolve!
+				d.resolve(ret);
+			})
+			.catchError(function(error:Dynamic) {
+				d.throwError(error);
+			});
+
+		return d.promise();
+	}
+
+    public static function add(movie:MovieSearchResult):Promise<TMovie> {
+        var d:Deferred<TMovie> = new Deferred<TMovie>();
+        var isNew:Bool = !movies.exists(movie.id);
+
+        if(!isNew) {
+            d.throwError('Movie ${movie.title} already exists!');
+            return d.promise();
+        }
+
+        var xhr:XMLHttpRequest = new XMLHttpRequest();
+        xhr.open("POST", 'http://localhost:8000/api/v1/movie', true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("Authorization", "Bearer " + Authenticate.token);
+        xhr.responseType = XMLHttpRequestResponseType.JSON;
+        xhr.onload = function() {
+            if(xhr.status >= 200 && xhr.status < 300) {
+                // parse it
+                var mov:TMovie = cast xhr.response;
+                mov.actorIDs = new Array<Int>();
+
+                // store it
+                movies.set(mov.id, mov);
+
+                // notify
+                changed.trigger();
+                d.resolve(mov);
+            }
+            else {
+                d.throwError(xhr.response);
+            }
+        };
+        xhr.onabort = function() { d.throwError('aborted add movie request'); }
+        xhr.onerror = function() { d.throwError('failed to get add movie'); }
+        xhr.ontimeout = function() { d.throwError('get add movie request timed out!'); }
+        xhr.send('id=${movie.id}');
+
+        return d.promise();
+    }
 
 	public static function delete(movie:TMovie):Promise<TMovie> {
 		var d:Deferred<TMovie> = new Deferred<TMovie>();

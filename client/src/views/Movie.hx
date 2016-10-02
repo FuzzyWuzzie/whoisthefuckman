@@ -131,7 +131,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 
 		Movies.delete(props.movie)
 			.then(function(movie:TMovie) {
-				Main.console.log('Removed movie ${props.movie.title}');
+				Main.console.log('Removed movie ${movie.title}');
 				setState({
 					expanded: state.expanded,
 					movies: Movies.movies,
@@ -163,7 +163,7 @@ class Movie extends ReactComponentOfPropsAndState<MovieProps, MovieState> {
 
 		Movies.deleteActor(props.movie, actor)
 			.then(function(movie:TMovie) {
-				Main.console.log('Removed actor ${actor.name} from movie ${props.movie.title}');
+				Main.console.log('Removed actor ${actor.name} from movie ${movie.title}');
 				setState({
 					expanded: state.expanded,
 					movies: Movies.movies,

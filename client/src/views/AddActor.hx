@@ -44,7 +44,9 @@ class AddActor extends ReactComponentOf<AddActorProps, AddActorState, AddActorRe
             return
                 React.createElement("div", {},
                     React.createElement("label", { className: "search" },
-                        React.createElement("i", {className: "fa fa-search"}),
+                        React.createElement("a", { href: "#", onClick: performSearch },
+                            React.createElement("i", {className: "fa fa-search"})
+                        ),
                         React.createElement("input", {
                             type: "text",
                             placeholder: "Actor name",

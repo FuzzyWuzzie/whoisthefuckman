@@ -129,9 +129,9 @@ li ul {
   position: relative;
 }
 
-.search i {
+.search a {
   position: absolute;
-  top: 0.1em;
+  top: -0.1em;
   right: 0.1em;
 }
 

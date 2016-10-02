@@ -86,6 +86,7 @@ module.exports = function(context, router) {
                 return context.models.movie.findById(req.body.id);
             })
             .then(function(movie) {
+                context.log.debug("added movie", context.sanitize.movie(movie));
                 res.json(context.sanitize.movie(movie));
             })
             .catch(function(error) {

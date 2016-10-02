@@ -50,7 +50,10 @@ class MovieList extends ReactComponentOfState<MovieListState> {
 		if(state.movies == null)
 			return React.createElement(Loader, {});
 		else
-			return React.createElement("ul", null, renderMovieList());
+			return React.createElement("div", {},
+				React.createElement("ul", null, renderMovieList()),
+				React.createElement(AddMovie)
+			);
 	}
 
 	private function renderMovieList():Array<ReactComponent> {
