@@ -56,6 +56,7 @@ class App extends ReactComponentOfState<AppState> {
 					React.createElement("p", null, Translation.get("home/tagline"))
 				),
 				state.authenticated ? React.createElement("p", null, "Make your changes below. When you're done, click the 'Regenerate' button to publish your changes.") : null,
+				state.authenticated ? React.createElement(RegenerateButton) : null,
 				state.authenticated ? React.createElement("article", null, React.createElement(MovieList, null)) : null,
 				React.createElement("footer", null,
 					React.createElement("p", null, "This product uses the TMDb API but is not endorsed or certified by TMDb."),
