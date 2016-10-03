@@ -9,7 +9,7 @@ var compression = require('compression');
 
 // load configuration
 require('toml-require').install();
-var config = require('./config.toml');
+var config = require('./data/config.toml');
 
 // initialize logging
 var log = bunyan.createLogger({
@@ -28,7 +28,7 @@ var db = new sequelize('data', '', '', {
         min: 0,
         idle: 10000
     },
-    storage: 'whoisthefuckman.db',
+    storage: './data/whoisthefuckman.db',
     logging: function(query) {
         log.trace("db query", { query: query });
     }
