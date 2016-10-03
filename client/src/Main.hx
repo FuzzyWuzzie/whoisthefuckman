@@ -8,7 +8,7 @@ import js.html.Console;
 import views.App;
 
 class Main {
-    public static var serverRoot:String = "http://localhost:8000";
+    public static var serverRoot:String = "http://138.197.132.156:8080";
     public static var apiRoot:String = serverRoot + "/api/v1";
 
 	public static var console:Console = Browser.console;

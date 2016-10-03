@@ -36,7 +36,7 @@ var db = new sequelize('data', '', '', {
 
 // initialize the server
 var app = express();
-var port = 8080;//config.server.port;
+var port = config.server.port;
 
 // enable CORS
 app.use(cors());
@@ -109,7 +109,12 @@ configuration.engageControllers(context, configuration.router);
 // deal with unhandled routes gracefully
 app.use(function(req, res, next) {
     res.status(404).json({
-        message: "endpoint not found"
+        message: "endpoint not found",
+	urls: {
+		original: req.originalUrl,
+		base: req.baseUrl,
+		path: req.path
+	}
     });
 });
 
