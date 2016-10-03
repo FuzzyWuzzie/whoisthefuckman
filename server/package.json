@@ -2,9 +2,9 @@
   "name": "whoisthefuckman",
   "version": "0.0.0",
   "description": "API for whoisthefuckman.com",
-  "main": "index.js",
+  "main": "whoisthefuckman_api.js",
   "scripts": {
-    "start": "node index.js | node_modules/.bin/bunyan",
+    "start": "node whoisthefuckman_api.js | node_modules/.bin/bunyan",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kenton Hamaluik",
