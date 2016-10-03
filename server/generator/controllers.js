@@ -46,11 +46,11 @@ module.exports = function(context, router) {
         var data = {};
 
         // do a clean run
-        fs.emptyDirSync("/public");
+        fs.emptyDirSync("./public");
         // make sure our output folders exist
-        fs.ensureDirSync("/public/assets");
-        fs.ensureDirSync("/public/actor");
-        fs.ensureDirSync("/public/movie");
+        fs.ensureDirSync("./public/assets");
+        fs.ensureDirSync("./public/actor");
+        fs.ensureDirSync("./public/movie");
 
         var compileAndSave = function(template, view, path) {
             var output = Mustache.render(template, view, partials);
@@ -136,7 +136,7 @@ module.exports = function(context, router) {
                 data.movies = movies;
                 return compileAndSave(homeTemplate, extend(rootView, {
                     movies: movies
-                }), "/public/index.html");
+                }), "./public/index.html");
             })
             .then(function() {
                 return fs.readFileAsync("templates/movie.mustache", 'utf8')
@@ -147,7 +147,7 @@ module.exports = function(context, router) {
                     var view = extend(rootView, {
                         movie: movie
                     });
-                    return compileAndSave(movieTemplate, view, "/public/movie/" + slug(movie.title) + ".html")
+                    return compileAndSave(movieTemplate, view, "./public/movie/" + slug(movie.title) + ".html")
                 });
                 return Promise.all(movieCompilePromises);
             })
@@ -171,14 +171,14 @@ module.exports = function(context, router) {
                     var view = extend(rootView, {
                         actor: actor
                     });
-                    return compileAndSave(actorTemplate, view, "/public/actor/" + slug(actor.name) + ".html")
+                    return compileAndSave(actorTemplate, view, "./public/actor/" + slug(actor.name) + ".html")
                 });
                 return Promise.all(actorCompilePromises);
             })
             .then(function() {
                 // copy the asset files
-                builtPaths.push("/public/assets/");
-                return fs.copyAsync("assets", "/public/assets");
+                builtPaths.push("./public/assets/");
+                return fs.copyAsync("assets", "./public/assets");
             })
             .then(function() {
                 res.json({
