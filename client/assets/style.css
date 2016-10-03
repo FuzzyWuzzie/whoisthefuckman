@@ -162,6 +162,10 @@ a:hover, a:focus, a:active {
   text-decoration: none;
 }
 
+.error {
+  color: #bf0a30;
+}
+
 /* loader! */
 .loader {
   border: 0.25em solid #f3f3f3;
