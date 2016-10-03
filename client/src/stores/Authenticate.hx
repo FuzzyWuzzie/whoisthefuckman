@@ -18,6 +18,7 @@ class Authenticate {
 			}
 		});
 		l.on("authenticated", onAuthenticated);
+		l.on("authorization_error", onUnauthorized);
 		l;
 	};
 
@@ -27,8 +28,19 @@ class Authenticate {
 	private static function set_authenticated(a:Bool):Bool {
 		var didChange:Bool = authenticated != a;
 		authenticated = a;
-		if(didChange) changed.trigger();
+		if(didChange)
+			changed.trigger();
+		if(unauthorized && authenticated)
+			unauthorized = false;
 		return authenticated;
+	}
+
+	public static var unauthorized(default, set):Bool = false;
+	private static function set_unauthorized(a:Bool):Bool {
+		var didChange:Bool = unauthorized != a;
+		unauthorized = a;
+		if(didChange) changed.trigger();
+		return unauthorized;
 	}
 
 	public static var token(default, null):String = null;
@@ -43,6 +55,11 @@ class Authenticate {
 	private static function onAuthenticated(authResult:Dynamic) {
 		js.Browser.getLocalStorage().setItem('idToken', authResult.idToken);
 		check();
+	}
+
+	private static function onUnauthorized(message:String) {
+		Main.console.log("Unauthorized: " + message);
+		unauthorized = true;
 	}
 
 	public static function check() {

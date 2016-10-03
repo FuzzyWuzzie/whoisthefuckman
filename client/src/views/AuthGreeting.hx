@@ -38,7 +38,9 @@ class AuthGreeting extends ReactComponentOfState<AuthGreetingState> {
 	}
 
 	override public function render() {
-		if(Authenticate.authenticated)
+		if(Authenticate.unauthorized)
+			return React.createElement("p", {className:"error"}, 'Access Denied.');
+		else if(Authenticate.authenticated)
 			return React.createElement("p", null,
 				React.createElement("span", null, 'Howdy, ${Authenticate.getName()}!')
 			);
