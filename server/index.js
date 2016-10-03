@@ -36,7 +36,7 @@ var db = new sequelize('data', '', '', {
 
 // initialize the server
 var app = express();
-var port = config.server.port;
+var port = 8080;//config.server.port;
 
 // enable CORS
 app.use(cors());
